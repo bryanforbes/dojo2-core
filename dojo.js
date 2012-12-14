@@ -750,7 +750,7 @@
 
 		defArgs = [ deps, factory ];
 	}, {
-		amd: { plugins: true, vendor: 'dojotoolkit.org' }
+		amd: { vendor: 'dojotoolkit.org' }
 	});
 
 	setGlobals(req, define);
