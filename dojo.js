@@ -12,7 +12,6 @@
 	// pack: pack is used internally to reference a package object (since javascript has reserved words including "package")
 	// prid: plugin resource identifier
 
-	has.add('loader-require-configuration', true);
 	/**
 	 * The global require function.
 	 * @param config //(object, optional) configuration options
@@ -61,6 +60,7 @@
 
 	has.add('host-browser', typeof document !== 'undefined' && typeof location !== 'undefined');
 	has.add('host-node', typeof process === 'object' && process.versions && process.versions.node);
+	has.add('loader-require-configuration', true);
 
 	//
 	// loader state data
