@@ -557,6 +557,8 @@
 
 		defineModule = function (module, deps, def) {
 			--waitingCount;
+			var pack = packs[module.pid],
+				config = pack && pack.config;
 			return mix(module, {
 				def: def,
 				deps: resolveDeps(deps, module, module),
@@ -568,7 +570,7 @@
 						module.cjs.exports = exports;
 					},
 					config: function () {
-						return module.config;
+						return config || {};
 					}
 				}
 			});
