@@ -697,6 +697,9 @@
 		}
 	});
 
+	var commentRE = /(\/\*([\s\S]*?)\*\/|\/\/(.*)$)/mg,
+		requireRE = /require\(["']([\w\!\-_\.\/]+)["']\)/g;
+
 	/**
 	 * @param deps //(array of commonjs.moduleId, optional)
 	 * @param factory //(any)
@@ -705,6 +708,14 @@
 		if (arguments.length === 1) {
 			factory = deps;
 			deps = [ 'require', 'exports', 'module' ];
+
+			// Scan factory for require() calls and add them to the
+			// list of dependencies
+			factory.toString()
+				.replace(commentRE, '')
+				.replace(requireRE, function(match, dep){
+					deps.push(dep);
+				});
 		}
 
 		defArgs = [ deps, factory ];
