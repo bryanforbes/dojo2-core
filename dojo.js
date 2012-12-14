@@ -725,7 +725,7 @@
 	});
 
 	var commentRE = /\/\*[\s\S]*?\*\/|\/\/.*$/mg,
-		requireRE = /require\s*\(\s*["']([^"']+)["']\s*\)/g;
+		requireRE = /require\s*\(\s*(["'])(.*?[^\\])\1\s*\)/g;
 	has.add('loader-dependency-scan', true);
 
 	var testFunction = function () {};
@@ -748,7 +748,7 @@
 					// strips comments
 					(has('function-tosource') ? factory.toSource() : factory.toString())
 						.replace(commentRE, '')
-						.replace(requireRE, function (match, dep) {
+						.replace(requireRE, function (match, quote, dep) {
 							deps.push(dep);
 							// Returning blank reduces memory consumed since
 							// 'undefined' will not be inserted into the string
