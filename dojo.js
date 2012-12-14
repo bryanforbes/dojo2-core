@@ -12,12 +12,28 @@
 	// pack: pack is used internally to reference a package object (since javascript has reserved words including "package")
 	// prid: plugin resource identifier
 
+	has.add('loader-require-configuration', true);
 	/**
 	 * The global require function.
+	 * @param config //(object, optional) configuration options
 	 * @param dependencies //(array of commonjs.moduleId, optional) list of modules to be loaded before applying callback
 	 * @param callback //(function, optional) lamda expression to apply to module values implied by dependencies
 	 */
-	var req = function (dependencies, callback) {
+	var req = function (config, dependencies, callback) {
+		if (Array.isArray(config) || typeof config === 'string') {
+			// Swap arguments if a configuration object was not provided
+			callback = dependencies;
+			dependencies = config;
+			config = null;
+		}
+		if (has('loader-require-configuration')) {
+			req.set(
+				config.baseUrl,
+				config.paths,
+				config.packages,
+				config.map
+			);
+		}
 		return contextRequire(dependencies, callback);
 	};
 
