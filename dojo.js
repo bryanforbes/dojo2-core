@@ -724,9 +724,12 @@
 		}
 	});
 
-	var commentRE = /(\/\*([\s\S]*?)\*\/|\/\/(.*)$)/mg,
-		requireRE = /require\(["']([\w\!\-_\.\/]+)["']\)/g;
+	var commentRE = /\/\*[\s\S]*?\*\/|\/\/.*$/mg,
+		requireRE = /require\s*\(\s*["']([^"']+)["']\s*\)/g;
 	has.add('loader-dependency-scan', true);
+
+	var testFunction = function () {};
+	has.add('function-tosource', !!testFunction.toSource);
 
 	/**
 	 * @param deps //(array of commonjs.moduleId, optional)
@@ -739,11 +742,15 @@
 
 			if (has('loader-dependency-scan')) {
 				// Scan factory for require() calls and add them to the
-				// list of dependencies
-				factory.toString()
+				// list of dependencies; prefer toSource() (FF) because it
+				// strips comments
+				(has('function-tosource') ? factory.toSource() : factory.toString())
 					.replace(commentRE, '')
-					.replace(requireRE, function(match, dep){
+					.replace(requireRE, function (match, dep) {
 						deps.push(dep);
+						// Returning blank reduces memory consumed since
+						// 'undefined' will not be inserted into the string
+						return '';
 					});
 			}
 		}
