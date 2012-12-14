@@ -737,21 +737,32 @@
 	 */
 	var define = mix(function (deps, factory) {
 		if (arguments.length === 1) {
-			factory = deps;
-			deps = [ 'require', 'exports', 'module' ];
+			if (typeof deps === 'function') {
+				// define(function(){})
+				factory = deps;
+				deps = [ 'require', 'exports', 'module' ];
 
-			if (has('loader-dependency-scan')) {
-				// Scan factory for require() calls and add them to the
-				// list of dependencies; prefer toSource() (FF) because it
-				// strips comments
-				(has('function-tosource') ? factory.toSource() : factory.toString())
-					.replace(commentRE, '')
-					.replace(requireRE, function (match, dep) {
-						deps.push(dep);
-						// Returning blank reduces memory consumed since
-						// 'undefined' will not be inserted into the string
-						return '';
-					});
+				if (has('loader-dependency-scan')) {
+					// Scan factory for require() calls and add them to the
+					// list of dependencies; prefer toSource() (FF) because it
+					// strips comments
+					(has('function-tosource') ? factory.toSource() : factory.toString())
+						.replace(commentRE, '')
+						.replace(requireRE, function (match, dep) {
+							deps.push(dep);
+							// Returning blank reduces memory consumed since
+							// 'undefined' will not be inserted into the string
+							return '';
+						});
+				}
+			}
+			else if (!Array.isArray(deps)) {
+				// define(object)
+				var value = deps;
+				deps = [];
+				factory = function () {
+					return value;
+				};
 			}
 		}
 
