@@ -23,7 +23,7 @@
 			// Swap arguments if a configuration object was not provided
 			callback = dependencies;
 			dependencies = config;
-			config = null;
+			config = {};
 		}
 		if (has('loader-require-configuration')) {
 			req.set(
