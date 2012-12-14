@@ -61,6 +61,7 @@
 	has.add('host-browser', typeof document !== 'undefined' && typeof location !== 'undefined');
 	has.add('host-node', typeof process === 'object' && process.versions && process.versions.node);
 	has.add('loader-require-configuration', true);
+	has.add('loader-package-config', true);
 
 	//
 	// loader state data
@@ -579,8 +580,10 @@
 
 		defineModule = function (module, deps, def) {
 			--waitingCount;
-			var pack = packs[module.pid],
-				config = pack && pack.config;
+			if (has('loader-package-config')) {
+				var pack = packs[module.pid],
+					config = pack && pack.config;
+			}
 			return mix(module, {
 				def: def,
 				deps: resolveDeps(deps, module, module),
@@ -592,7 +595,7 @@
 						module.cjs.exports = exports;
 					},
 					config: function () {
-						return config || {};
+						return (has('loader-package-config') ? config : module.config) || {};
 					}
 				}
 			});
