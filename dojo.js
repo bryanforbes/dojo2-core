@@ -621,7 +621,7 @@
 
 			node.charset = 'utf-8';
 			node.src = url;
-			document.head.appendChild(node);
+			document.head.insertBefore(node, null);
 		};
 
 		setGlobals = function (require, define) {
