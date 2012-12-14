@@ -707,6 +707,7 @@
 
 	var commentRE = /(\/\*([\s\S]*?)\*\/|\/\/(.*)$)/mg,
 		requireRE = /require\(["']([\w\!\-_\.\/]+)["']\)/g;
+	has.add('loader-dependency-scan', true);
 
 	/**
 	 * @param deps //(array of commonjs.moduleId, optional)
@@ -717,13 +718,15 @@
 			factory = deps;
 			deps = [ 'require', 'exports', 'module' ];
 
-			// Scan factory for require() calls and add them to the
-			// list of dependencies
-			factory.toString()
-				.replace(commentRE, '')
-				.replace(requireRE, function(match, dep){
-					deps.push(dep);
-				});
+			if (has('loader-dependency-scan')) {
+				// Scan factory for require() calls and add them to the
+				// list of dependencies
+				factory.toString()
+					.replace(commentRE, '')
+					.replace(requireRE, function(match, dep){
+						deps.push(dep);
+					});
+			}
 		}
 
 		defArgs = [ deps, factory ];
