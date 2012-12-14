@@ -154,6 +154,10 @@
 				if (module.executed !== true) {
 					throw new Error('Attempt to require unloaded module ' + module.mid);
 				}
+				// Assign the result of the module to `module`
+				// otherwise require('moduleId') returns the internal
+				// module representation
+				module = module.result;
 			}
 			else {
 				// signature is (requestList [,callback])
@@ -396,7 +400,9 @@
 				result = typeof factory === 'function' ? factory.apply(null, args) : factory;
 
 				// TODO: But of course, module.cjs always exists.
-				module.result = result === undefined && module.cjs ? module.cjs.exports : result;
+				// Assign the new module.result to result so plugins can use exports
+				// to define their interface; the plugin checks below use result
+				result = module.result = result === undefined && module.cjs ? module.cjs.exports : result;
 				module.executed = true;
 				executedSomething = true;
 
