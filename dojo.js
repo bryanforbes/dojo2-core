@@ -728,9 +728,6 @@
 		requireRE = /require\s*\(\s*(["'])(.*?[^\\])\1\s*\)/g;
 	has.add('loader-dependency-scan', true);
 
-	var testFunction = function () {};
-	has.add('function-tosource', !!testFunction.toSource);
-
 	/**
 	 * @param deps //(array of commonjs.moduleId, optional)
 	 * @param factory //(any)
@@ -744,9 +741,8 @@
 
 				if (has('loader-dependency-scan')) {
 					// Scan factory for require() calls and add them to the
-					// list of dependencies; prefer toSource() (FF) because it
-					// strips comments
-					(has('function-tosource') ? factory.toSource() : factory.toString())
+					// list of dependencies
+					factory.toString()
 						.replace(commentRE, '')
 						.replace(requireRE, function (match, quote, dep) {
 							deps.push(dep);
