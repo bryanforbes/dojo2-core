@@ -1,5 +1,9 @@
-define(["exports", "./_base/kernel", "./sniff", "./_base/window", "./dom", "./dom-attr", "./on"],
-		function(exports, dojo, has, win, dom, attr, on){
+define([
+	'module',
+	'exports',
+	'./sniff',
+	'../dom'
+], function (module, exports, has, dom) {
 	// module:
 	//		dojo/dom-construct
 	// summary:
@@ -9,133 +13,131 @@ define(["exports", "./_base/kernel", "./sniff", "./_base/window", "./dom", "./do
 
 	// support stuff for toDom()
 	var tagWrap = {
-			option: ["select"],
-			tbody: ["table"],
-			thead: ["table"],
-			tfoot: ["table"],
-			tr: ["table", "tbody"],
-			td: ["table", "tbody", "tr"],
-			th: ["table", "thead", "tr"],
-			legend: ["fieldset"],
-			caption: ["table"],
-			colgroup: ["table"],
-			col: ["table", "colgroup"],
-			li: ["ul"]
+			option: ['select'],
+			tbody: ['table'],
+			thead: ['table'],
+			tfoot: ['table'],
+			tr: ['table', 'tbody'],
+			td: ['table', 'tbody', 'tr'],
+			th: ['table', 'thead', 'tr'],
+			legend: ['fieldset'],
+			caption: ['table'],
+			colgroup: ['table'],
+			col: ['table', 'colgroup'],
+			li: ['ul']
 		},
 		reTag = /<\s*([\w\:]+)/,
-		masterNode = {}, masterNum = 0,
-		masterName = "__" + dojo._scopeName + "ToDomId";
+		masterNodes = {}, masterNum = 0,
+		masterName = '__' + module.id.replace(/\//g, '_') + 'ToDomId';
 
 	// generate start/end tag strings to use
 	// for the injection for each special tag wrap case.
-	for(var param in tagWrap){
-		if(tagWrap.hasOwnProperty(param)){
+	for (var param in tagWrap) {
+		if (tagWrap.hasOwnProperty(param)) {
 			var tw = tagWrap[param];
-			tw.pre = param == "option" ? '<select multiple="multiple">' : "<" + tw.join("><") + ">";
-			tw.post = "</" + tw.reverse().join("></") + ">";
+			tw.pre = param === 'option' ? '<select multiple="multiple">' : '<' + tw.join('><') + '>';
+			tw.post = '</' + tw.reverse().join('></') + '>';
 			// the last line is destructive: it reverses the array,
 			// but we don't care at this point
 		}
 	}
 
-	function _insertBefore(/*DomNode*/ node, /*DomNode*/ ref){
+	function _insertBefore(/*DomNode*/ node, /*DomNode*/ ref) {
 		var parent = ref.parentNode;
-		if(parent){
+		if (parent) {
 			parent.insertBefore(node, ref);
 		}
 	}
 
-	function _insertAfter(/*DomNode*/ node, /*DomNode*/ ref){
+	function _insertAfter(/*DomNode*/ node, /*DomNode*/ ref) {
 		// summary:
 		//		Try to insert node after ref
 		var parent = ref.parentNode;
-		if(parent){
-			if(parent.lastChild == ref){
+		if (parent) {
+			if (parent.lastChild === ref) {
 				parent.appendChild(node);
-			}else{
+			}
+			else {
 				parent.insertBefore(node, ref.nextSibling);
 			}
 		}
 	}
 
-	exports.toDom = function toDom(frag, doc){
-		// summary:
-		//		instantiates an HTML fragment returning the corresponding DOM.
-		// frag: String
-		//		the HTML fragment
-		// doc: DocumentNode?
-		//		optional document to use when creating DOM nodes, defaults to
-		//		dojo.doc if not specified.
-		// returns:
-		//		Document fragment, unless it's a single node in which case it returns the node itself
+	/**
+	 * Creates an Element or DocumentFragment from an HTML fragment.
+	 *
+	 * @param {string} fragment
+	 * The HTML fragment
+	 *
+	 * @param {Document=} targetDocument
+	 * Document to use when creating elements. Defaults to the document global.
+	 *
+	 * @returns {(Element|DocumentFragment)}
+	 * If the fragment is a single node, it is returned. Otherwise, a DocumentFragment is returned.
+	 */
+	exports.toDom = function toDom(fragment, targetDocument) {
 		// example:
 		//		Create a table row:
-		//	|	var tr = dojo.toDom("<tr><td>First!</td></tr>");
+		//	|	var tr = dojo.toDom('<tr><td>First!</td></tr>');
 
-		doc = doc || win.doc;
-		var masterId = doc[masterName];
-		if(!masterId){
-			doc[masterName] = masterId = ++masterNum + "";
-			masterNode[masterId] = doc.createElement("div");
+		targetDocument = targetDocument || document;
+		var masterId = targetDocument[masterName];
+		if (!masterId) {
+			targetDocument[masterName] = masterId = ++masterNum + '';
+			masterNodes[masterId] = targetDocument.createElement('div');
 		}
 
 		// make sure the frag is a string.
-		frag += "";
+		fragment += '';
 
 		// find the starting tag, and get node wrapper
-		var match = frag.match(reTag),
-			tag = match ? match[1].toLowerCase() : "",
-			master = masterNode[masterId],
+		var match = fragment.match(reTag),
+			tag = match ? match[1].toLowerCase() : '',
+			master = masterNodes[masterId],
 			wrap, i, fc, df;
-		if(match && tagWrap[tag]){
+		if (match && tagWrap[tag]) {
 			wrap = tagWrap[tag];
-			master.innerHTML = wrap.pre + frag + wrap.post;
-			for(i = wrap.length; i; --i){
+			master.innerHTML = wrap.pre + fragment + wrap.post;
+			for (i = wrap.length; i; --i) {
 				master = master.firstChild;
 			}
-		}else{
-			master.innerHTML = frag;
+		}
+		else {
+			master.innerHTML = fragment;
 		}
 
 		// one node shortcut => return the node itself
-		if(master.childNodes.length == 1){
+		if (master.childNodes.length === 1) {
 			return master.removeChild(master.firstChild); // DOMNode
 		}
 
 		// return multiple nodes as a document fragment
-		df = doc.createDocumentFragment();
-		while((fc = master.firstChild)){ // intentional assignment
+		df = targetDocument.createDocumentFragment();
+		while ((fc = master.firstChild)) { // intentional assignment
 			df.appendChild(fc);
 		}
 		return df; // DocumentFragment
 	};
 
-	exports.place = function place(/*DOMNode|String*/ node, /*DOMNode|String*/ refNode, /*String|Number?*/ position){
-		// summary:
-		//		Attempt to insert node into the DOM, choosing from various positioning options.
-		//		Returns the first argument resolved to a DOM node.
-		// node: DOMNode|String
-		//		id or node reference, or HTML fragment starting with "<" to place relative to refNode
-		// refNode: DOMNode|String
-		//		id or node reference to use as basis for placement
-		// position: String|Number?
-		//		string noting the position of node relative to refNode or a
-		//		number indicating the location in the childNodes collection of refNode.
-		//		Accepted string values are:
-		//
-		//		- before
-		//		- after
-		//		- replace
-		//		- only
-		//		- first
-		//		- last
-		//
-		//		"first" and "last" indicate positions as children of refNode, "replace" replaces refNode,
-		//		"only" replaces all children.  position defaults to "last" if not specified
-		// returns: DOMNode
-		//		Returned values is the first argument resolved to a DOM node.
-		//
-		//		.place() is also a method of `dojo/NodeList`, allowing `dojo.query` node lookups.
+	/**
+	 * Attempt to insert node into the DOM, choosing from various positioning options.
+	 *
+	 * @param {(Node|string)} node
+	 * ID or node reference to place relative to refNode
+	 *
+	 * @param {(Node|string)} refNode
+	 * ID or node reference to use as basis for placement
+	 *
+	 * @param {(string|number)=} position
+	 * String noting the position of node relative to refNode or a
+	 * number indicating the location in the childNodes collection of refNode.
+	 * Accepted string values are "before", "after", "replace", "only", "first",
+	 * and "last". Default is "last".
+	 *
+	 * @returns {Node}
+	 * The first argument resolved to a DOM node.
+	 */
+	exports.place = function place(node, refNode, position) {
 		// example:
 		//		Place a node by string id as the last child of another node by string id:
 		//	|	dojo.place("someNode", "anotherNode");
@@ -149,46 +151,55 @@ define(["exports", "./_base/kernel", "./sniff", "./_base/window", "./dom", "./do
 		//		Put a new LI as the first child of a list by id:
 		//	|	dojo.place("<li></li>", "someUl", "first");
 
+		node = dom.byId(node);
 		refNode = dom.byId(refNode);
-		if(typeof node == "string"){ // inline'd type check
-			node = /^\s*</.test(node) ? exports.toDom(node, refNode.ownerDocument) : dom.byId(node);
-		}
-		if(typeof position == "number"){ // inline'd type check
-			var cn = refNode.childNodes;
-			if(!cn.length || cn.length <= position){
+
+		if (typeof position === 'number') {
+			var childNodes = refNode.childNodes;
+			if (!childNodes.length || childNodes.length <= position) {
 				refNode.appendChild(node);
-			}else{
-				_insertBefore(node, cn[position < 0 ? 0 : position]);
 			}
-		}else{
-			switch(position){
-				case "before":
-					_insertBefore(node, refNode);
+			else {
+				_insertBefore(node, childNodes[position < 0 ? 0 : position]);
+			}
+		}
+		else {
+			switch (position) {
+			case 'before':
+				_insertBefore(node, refNode);
+				break;
+			case 'after':
+				_insertAfter(node, refNode);
+				break;
+			case 'replace':
+				refNode.parentNode.replaceChild(node, refNode);
+				break;
+			case 'only':
+				exports.empty(refNode);
+				refNode.appendChild(node);
+				break;
+			case 'first':
+				if (refNode.firstChild) {
+					_insertBefore(node, refNode.firstChild);
 					break;
-				case "after":
-					_insertAfter(node, refNode);
-					break;
-				case "replace":
-					refNode.parentNode.replaceChild(node, refNode);
-					break;
-				case "only":
-					exports.empty(refNode);
-					refNode.appendChild(node);
-					break;
-				case "first":
-					if(refNode.firstChild){
-						_insertBefore(node, refNode.firstChild);
-						break;
-					}
-					// else fallthrough...
-				default: // aka: last
-					refNode.appendChild(node);
+				}
+				// else fallthrough...
+			default: // aka: last
+				refNode.appendChild(node);
 			}
 		}
 		return node; // DomNode
 	};
 
-	exports.create = function create(/*DOMNode|String*/ tag, /*Object*/ attrs, /*DOMNode|String?*/ refNode, /*String?*/ pos){
+	/**
+	 * Create an element, allowing for optional attribute decoration and placement.
+	 *
+	 * @param {string} tag
+	 * @param {Object=} attrs
+	 * @param {(Element|string)=} refNode
+	 * @param {string=} pos
+	 */
+	exports.create = function create(tag, attrs, refNode, pos) {
 		// summary:
 		//		Create an element, allowing for optional attribute decoration
 		//		and placement.
@@ -220,110 +231,122 @@ define(["exports", "./_base/kernel", "./sniff", "./_base/window", "./dom", "./do
 		//		'refNode' is required if a 'pos' is specified.
 		// example:
 		//		Create a DIV:
-		//	|	var n = dojo.create("div");
+		//	|	var n = dojo.create('div');
 		//
 		// example:
 		//		Create a DIV with content:
-		//	|	var n = dojo.create("div", { innerHTML:"<p>hi</p>" });
+		//	|	var n = dojo.create('div', { innerHTML:'<p>hi</p>' });
 		//
 		// example:
 		//		Place a new DIV in the BODY, with no attributes set
-		//	|	var n = dojo.create("div", null, dojo.body());
+		//	|	var n = dojo.create('div', null, dojo.body());
 		//
 		// example:
 		//		Create an UL, and populate it with LI's. Place the list as the first-child of a
-		//		node with id="someId":
-		//	|	var ul = dojo.create("ul", null, "someId", "first");
-		//	|	var items = ["one", "two", "three", "four"];
+		//		node with id='someId':
+		//	|	var ul = dojo.create('ul', null, 'someId', 'first');
+		//	|	var items = ['one', 'two', 'three', 'four'];
 		//	|	dojo.forEach(items, function(data){
-		//	|		dojo.create("li", { innerHTML: data }, ul);
+		//	|		dojo.create('li', { innerHTML: data }, ul);
 		//	|	});
 		//
 		// example:
 		//		Create an anchor, with an href. Place in BODY:
-		//	|	dojo.create("a", { href:"foo.html", title:"Goto FOO!" }, dojo.body());
+		//	|	dojo.create('a', { href:'foo.html', title:'Goto FOO!' }, dojo.body());
 		//
 		// example:
 		//		Create a `dojo/NodeList()` from a new element (for syntactic sugar):
 		//	|	dojo.query(dojo.create('div'))
-		//	|		.addClass("newDiv")
+		//	|		.addClass('newDiv')
 		//	|		.onclick(function(e){ console.log('clicked', e.target) })
-		//	|		.place("#someNode"); // redundant, but cleaner.
+		//	|		.place('#someNode'); // redundant, but cleaner.
 
-		var doc = win.doc;
-		if(refNode){
+		var doc = document;
+		if (refNode) {
 			refNode = dom.byId(refNode);
 			doc = refNode.ownerDocument;
 		}
-		if(typeof tag == "string"){ // inline'd type check
+		if (typeof tag === 'string') { // inline'd type check
 			tag = doc.createElement(tag);
 		}
-		if(attrs){ attr.set(tag, attrs); }
-		if(refNode){ exports.place(tag, refNode, pos); }
+		// TODO: Figure out how we want to do attribute/property assignment
+		/*if (attrs) {
+			attr.set(tag, attrs);
+		}*/
+		if (refNode) {
+			exports.place(tag, refNode, pos);
+		}
 		return tag; // DomNode
 	};
 
-	var _empty = has("ie") ?
-		function(/*DomNode*/ node){
-			try{
-				node.innerHTML = ""; // really fast when it works
-			}catch(e){ // IE can generate Unknown Error
-				for(var c; c = node.lastChild;){ // intentional assignment
-					_destroy(c, node); // destroy is better than removeChild so TABLE elements are removed in proper order
-				}
+	function _empty(node) {
+		try {
+			node.innerHTML = '';
+		}
+		catch (e) {} // IE can generate Unknown Error
+		if (node.childNodes.length) {
+			// DocumentFragments and elements that throw will still
+			// have child nodes
+			var child;
+			while ((child = node.lastChild)) {
+				// use _destroy so table elements will be removed in
+				// the proper order
+				_destroy(child, node);
 			}
-		} :
-		function(/*DomNode*/ node){
-			node.innerHTML = "";
-		};
+		}
+	}
 
-	exports.empty = function empty(/*DOMNode|String*/ node){
-		 // summary:
-		 //		safely removes all children of the node.
-		 // node: DOMNode|String
-		 //		a reference to a DOM node or an id.
-		 // example:
-		 //		Destroy node's children byId:
-		 //	|	dojo.empty("someId");
-		 //
-		 // example:
-		 //		Destroy all nodes' children in a list by reference:
-		 //	|	dojo.query(".someNode").forEach(dojo.empty);
-
-		_empty(dom.byId(node));
-	};
-
-
-	function _destroy(/*DomNode*/ node, /*DomNode*/ parent){
-		if(node.firstChild){
+	function _destroy(node, parent) {
+		if (node.firstChild) {
 			_empty(node);
 		}
-		if(parent){
+		if (parent) {
 			parent.removeChild(node);
 		}
 	}
-	exports.destroy = function destroy(/*DOMNode|String*/ node){
-		// summary:
-		//		Removes a node from its parent, clobbering it and all of its
-		//		children.
-		//
-		// description:
-		//		Removes a node from its parent, clobbering it and all of its
-		//		children. Function only works with DomNodes, and returns nothing.
-		//
-		// node: DOMNode|String
-		//		A String ID or DomNode reference of the element to be destroyed
-		//
+
+	/**
+	 * Removes all children of an element.
+	 *
+	 * @param {(Element|string)} node
+	 * ID or node reference of the element to empty.
+	 */
+	exports.empty = function empty(/*DOMNode|String*/ node) {
+		 // example:
+		 //		Destroy node's children byId:
+		 //	|	dojo.empty('someId');
+		 //
+		 // example:
+		 //		Destroy all nodes' children in a list by reference:
+		 //	|	dojo.query('.someNode').forEach(dojo.empty);
+
+		node = dom.byId(node);
+		if (!node) {
+			return;
+		}
+		_empty(node);
+	};
+
+
+	/**
+	 * Removes a node from its parent, destroying it and all of its children
+	 *
+	 * @param {(Element|string)} node
+	 * ID or node references of the element to be destroyed
+	 */
+	exports.destroy = function destroy(/*DOMNode|String*/ node) {
 		// example:
 		//		Destroy a node byId:
-		//	|	dojo.destroy("someId");
+		//	|	dojo.destroy('someId');
 		//
 		// example:
 		//		Destroy all nodes in a list by reference:
-		//	|	dojo.query(".someNode").forEach(dojo.destroy);
+		//	|	dojo.query('.someNode').forEach(dojo.destroy);
 
 		node = dom.byId(node);
-		if(!node){ return; }
+		if (!node) {
+			return;
+		}
 		_destroy(node, node.parentNode);
 	};
 });
