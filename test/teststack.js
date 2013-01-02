@@ -3,20 +3,20 @@ define({
 	proxyPort: 9000,
 
 	// A fully qualified URL to the client.html that is passed to remotely driven browsers for unit testing
-	clientHtmlLocation: 'http://localhost:9000/client.html',
+	clientHtmlLocation: 'http://localhost:9000/__teststack/client.html',
 
 	// Browsers to run integration testing against. Note that version numbers must be strings if used with Sauce
-	// OnDemand. Available options are browserName, browserVersion, platformName, and platformVersion
+	// OnDemand. Available options are browserName, version, platform, and platformVersion
 	browsers: [
-		{ browserName: 'internet explorer', platformName: 'Windows 2012', browserVersion: '10' },
-// TODO: IE9 hangs, so disable until it can be investigated
-//		{ browserName: 'internet explorer', platformName: 'Windows 2008', browserVersion: '9' },
-		{ browserName: 'firefox', platformName: [ 'Linux', 'Mac 10.6', 'Windows 2012' ] },
-		{ browserName: 'chrome', platformName: [ 'Linux', 'Mac 10.8', 'Windows 2008' ] },
-		{ browserName: 'safari', platformName: 'Mac 10.8', browserVersion: '6' },
-		{ browserName: 'safari', platformName: 'Mac 10.6', browserVersion: '5' },
-// TODO: OperaDriver does not support async script execution, so disable until results are sent back by XHR
-//		{ browserName: 'opera', platformName: [ 'LINUX', 'MAC', 'WINDOWS' ] }
+		{ browserName: 'internet explorer', version: '10', platform: 'Windows 2012' },
+		{ browserName: 'internet explorer', platform: 'Windows 2008', version: '9' },
+		// Firefox 17 Mac is currently unavailable on Sauce Labs
+		{ browserName: 'firefox', version: '17', platform: [ 'Linux', 'Windows 2012' ] },
+		{ browserName: 'chrome', platform: [ 'Linux', 'Mac 10.8', 'Windows 2008' ] },
+		{ browserName: 'safari', version: '6', platform: 'Mac 10.8' },
+		{ browserName: 'safari', version: '5', platform: 'Mac 10.6' },
+		// Opera Mac is currently unavailable on Sauce Labs
+		{ browserName: 'opera', version: '12', platform: [ 'Linux', 'Windows 2008' ] }
 	],
 
 	// Maximum number of simultaneous integration tests that should be executed on the remote WebDriver service
@@ -34,7 +34,7 @@ define({
 	},
 
 	// Packages that should be registered with the loader in each testing environment
-	packages: null,
+	packages: [ { name: 'dojo', location: 'dojo2-core' } ],
 
 	// Non-functional test suite(s) to run in each browser
 	suites: [ 'dojo/test/all' ],

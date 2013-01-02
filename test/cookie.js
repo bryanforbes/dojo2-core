@@ -1,8 +1,8 @@
 define([
 	'teststack!tdd',
 	'teststack/lib/assert',
-	'dojo/has',
-	'dojo/has!host-browser?dojo/cookie'
+	'dojo-ts/has',
+	'dojo-ts/has!host-browser?../cookie'
 ], function (test, assert, has, cookie) {
 	var aKey = 'a=; ',
 		aValue = 'a1=; ',
@@ -70,25 +70,29 @@ define([
 
 			var expiry = new Date(),
 				secondsToWait = 2,
-				dfd = this.async((secondsToWait + 3) * 1000, 2);
+				dfd = this.async((secondsToWait + 3) * 1000, 2),
+				// The fuzz value is set high because at least Opera 12 seems to not clear cookies exactly when it
+				// should; a small fuzz value is needed in any case to avoid timers that fire a little early leading
+				// to spontaneous test failures
+				msFuzz = 1000;
 
-			expiry.setSeconds(expiry.getSeconds() + secondsToWait);
+			expiry.setSeconds(expiry.getSeconds() + secondsToWait, 0);
 			cookie.setItem(aKey, aValue, { expires: expiry });
 			assert.isEqual(cookie.length, 1, 'expiring cookie a is set');
-
-			expiry = new Date(expiry);
-			expiry.setSeconds(expiry.getSeconds() + secondsToWait);
-			cookie.setItem(bKey, bValue, { expires: expiry });
-			assert.isEqual(cookie.length, 2, 'expiring cookie b is set');
 
 			setTimeout(dfd.callback(function () {
 				assert.isEqual(cookie.length, 1, 'one expired cookie expired');
 				assert.isEqual(cookie.getItem(aKey), null, 'cookie a correctly expired');
-			}), (secondsToWait + 1) * 1000);
+			}), expiry - Date.now() + msFuzz);
+
+			expiry = new Date(expiry);
+			expiry.setSeconds(expiry.getSeconds() + secondsToWait, 0);
+			cookie.setItem(bKey, bValue, { expires: expiry });
+			assert.isEqual(cookie.length, 2, 'expiring cookie b is set');
 
 			setTimeout(dfd.callback(function () {
 				assert.isEqual(cookie.length, 0, 'two expired cookies expired');
-			}), (secondsToWait + 2) * 1000);
+			}), expiry - Date.now() + msFuzz);
 		});
 	});
 });

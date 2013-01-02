@@ -55,6 +55,11 @@
 	has.add('host-browser', typeof document !== 'undefined' && typeof location !== 'undefined');
 	has.add('host-node', typeof process === 'object' && process.versions && process.versions.node);
 
+	// IE9 will process multiple scripts at once before firing their respective onload events, so some extra work
+	// needs to be done to associate the content of the define call with the correct node. This is known to be fixed
+	// in IE10 and the bad behaviour cannot be inferred through feature detection, so simply target this one user-agent
+	has.add('loader-ie9-compat', has('host-browser') && navigator.userAgent.indexOf('MSIE 9.0') > -1);
+
 	has.add('loader-configurable', true);
 	if (has('loader-configurable')) {
 		/**
@@ -66,7 +71,7 @@
 		var configure = function (config) {
 			// TODO: Expose all properties on req as getter/setters? Plugin modules like dojo/node being able to
 			// retrieve baseUrl is important.
-			baseUrl = config.baseUrl || baseUrl;
+			baseUrl = (config.baseUrl || baseUrl).replace(/\/*$/, '/');
 
 			mix(map, config.map);
 
@@ -74,6 +79,10 @@
 				// Allow shorthand package definition, where name and location are the same
 				if (typeof p === 'string') {
 					p = { name: p, location: p };
+				}
+
+				if (p.location != null) {
+					p.location = p.location.replace(/\/*$/, '/');
 				}
 
 				packs[p.name] = p;
@@ -223,7 +232,7 @@
 				// module representation
 				module = module.result;
 			}
-			else {
+			else if (Array.isArray(a1)) {
 				// signature is (requestList [,callback])
 				// construct a synthetic module to control execution of the requestList, and, optionally, callback
 				module = getModuleInfo('*' + (++uidGenerator));
@@ -314,12 +323,14 @@
 
 			// map the mid
 			if ((mapItem = runMapProg(mid, (referenceModule && runMapProg(referenceModule.mid, mapProgs) || mapProgs.star)))) {
-				mid = mapItem[1] + mid.substring(mapItem[3]);
+				mid = mapItem[1] + mid.slice(mapItem[3]);
 			}
 
 			match = mid.match(/^([^\/]+)(\/(.+))?$/);
 			pid = match ? match[1] : '';
-			if ((pack = packs[pid])) {
+			pack = packs[pid];
+
+			if (pack) {
 				mid = pid + '/' + (midInPackage = (match[3] || pack.main || 'main'));
 			}
 			else {
@@ -328,12 +339,18 @@
 
 			if (!(result = modules[mid])) {
 				mapItem = runMapProg(mid, pathsMapProg);
-				url = mapItem ? mapItem[1] + mid.substring(mapItem[3]) : (pid ? pack.location + '/' + midInPackage : mid);
+				url = mapItem ? mapItem[1] + mid.slice(mapItem[3]) : (pid ? pack.location + midInPackage : mid);
 				result = {
 					pid: pid,
 					mid: mid,
 					pack: pack,
-					url: compactPath((/(?:^\/)|(?:\:)/.test(url) ? '' : baseUrl) + url + (/\.js(?:\?[^?]*)?$/.test(url) ? '' : '.js'))
+					url: compactPath(
+						// absolute urls should not be prefixed with baseUrl
+						(/^(?:\/|\w+:)/.test(url) ? '' : baseUrl) +
+						url +
+						// urls with a javascript extension should not have another one added
+						(/\.js(?:\?[^?]*)?$/.test(url) ? '' : '.js')
+					)
 				};
 			}
 
@@ -494,7 +511,7 @@
 
 					// pluginResource is really just a placeholder with the wrong mid (because we couldn't calculate it until the plugin was on board)
 					// fix() replaces the pseudo module in a resolved deps array with the real module
-					// lastly, mark the pseuod module as arrived and delete it from modules
+					// lastly, mark the pseudo module as arrived and delete it from modules
 					pseudoPluginResource.fix(modules[mid]);
 					--waitingCount;
 					delete modules[pseudoPluginResource.mid];
@@ -582,9 +599,13 @@
 			}
 			else if (!module.injected) {
 				var cached,
-					onLoadCallback = function () {
+					onLoadCallback = function (node) {
 						// defArgs is an array of [dependencies, factory]
 						consumePendingCacheInsert(module);
+
+						if (has('loader-ie9-compat') && node) {
+							defArgs = node.defArgs;
+						}
 
 						// non-amd module
 						if (!defArgs) {
@@ -658,7 +679,7 @@
 					document.head.removeChild(node);
 
 					if (event.type === 'load') {
-						callback();
+						has('loader-ie9-compat') ? callback(node) : callback();
 					}
 					else {
 						throw new Error('Failed to load module ' + module.mid + ' from ' + url + (parent ? ' (parent: ' + parent.mid + ')' : ''));
@@ -684,10 +705,10 @@
 
 		// retain the ability to get node's require
 		req.nodeRequire = require;
-		injectUrl = function (url, callback) {
+		injectUrl = function (url, callback, module, parent) {
 			fs.readFile(url, 'utf8', function (error, data) {
 				if (error) {
-					throw error;
+					throw new Error('Failed to load module ' + module.mid + ' from ' + url + (parent ? ' (parent: ' + parent.mid + ')' : ''));
 				}
 
 				vm.runInThisContext(data, url);
@@ -757,7 +778,17 @@
 			}
 		}
 
-		defArgs = [ deps, factory ];
+		if (has('loader-ie9-compat')) {
+			for (var i = document.scripts.length - 1, script; (script = document.scripts[i]); --i) {
+				if (script.readyState === 'interactive') {
+					script.defArgs = [ deps, factory ];
+					break;
+				}
+			}
+		}
+		else {
+			defArgs = [ deps, factory ];
+		}
 	}, {
 		amd: { vendor: 'dojotoolkit.org' }
 	});
