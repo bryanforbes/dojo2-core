@@ -43,7 +43,7 @@ define([
 	 * @param {Object} destination
 	 * The object to which to add all properties
 	 * @param {...Object} var_args
-	 * One or more object from which to copy all properties
+	 * One or more objects from which to copy all properties
 	 * @returns {Object}
 	 */
 	exports.mixin = function mixin(destination) {
