@@ -42,27 +42,6 @@ define([
 		}
 	}
 
-	function _insertBefore(/*DomNode*/ node, /*DomNode*/ ref) {
-		var parent = ref.parentNode;
-		if (parent) {
-			parent.insertBefore(node, ref);
-		}
-	}
-
-	function _insertAfter(/*DomNode*/ node, /*DomNode*/ ref) {
-		// summary:
-		//		Try to insert node after ref
-		var parent = ref.parentNode;
-		if (parent) {
-			if (parent.lastChild === ref) {
-				parent.appendChild(node);
-			}
-			else {
-				parent.insertBefore(node, ref.nextSibling);
-			}
-		}
-	}
-
 	/**
 	 * Creates an Element or DocumentFragment from an HTML fragment.
 	 *
@@ -120,79 +99,185 @@ define([
 	};
 
 	/**
-	 * Attempt to insert node into the DOM, choosing from various positioning options.
+	 * Insert a node into the DOM at the specified index of the parent node.
 	 *
 	 * @param {(Node|string)} node
-	 * ID or node reference to place relative to refNode
+	 * ID or node reference to insert as a child
 	 *
-	 * @param {(Node|string)} refNode
-	 * ID or node reference to use as basis for placement
+	 * @param {number} position
+	 * Index to insert node into parent
 	 *
-	 * @param {(string|number)=} position
-	 * String noting the position of node relative to refNode or a
-	 * number indicating the location in the childNodes collection of refNode.
-	 * Accepted string values are "before", "after", "replace", "only", "first",
-	 * and "last". Default is "last".
+	 * @param {(Node|string)} parentNode
+	 * ID or node reference to insert child into
 	 *
 	 * @returns {Node}
-	 * The first argument resolved to a DOM node.
+	 * The first argument resolved to an Element
 	 */
-	exports.place = function place(node, refNode, position) {
-		// example:
-		//		Place a node by string id as the last child of another node by string id:
-		//	|	dojo.place("someNode", "anotherNode");
-		// example:
-		//		Place a node by string id before another node by string id
-		//	|	dojo.place("someNode", "anotherNode", "before");
-		// example:
-		//		Create a Node, and place it in the body element (last child):
-		//	|	dojo.place("<div></div>", dojo.body());
-		// example:
-		//		Put a new LI as the first child of a list by id:
-		//	|	dojo.place("<li></li>", "someUl", "first");
-
+	exports.insertAtIndex = function insertAtIndex(node, index, parentNode) {
 		node = dom.byId(node);
-		refNode = dom.byId(refNode);
+		parentNode = dom.byId(parentNode);
 
-		if (typeof position === 'number') {
-			var childNodes = refNode.childNodes;
-			if (!childNodes.length || childNodes.length <= position) {
-				refNode.appendChild(node);
-			}
-			else {
-				_insertBefore(node, childNodes[position < 0 ? 0 : position]);
-			}
-		}
-		else {
-			switch (position) {
-			case 'before':
-				_insertBefore(node, refNode);
-				break;
-			case 'after':
-				_insertAfter(node, refNode);
-				break;
-			case 'replace':
-				refNode.parentNode.replaceChild(node, refNode);
-				break;
-			case 'only':
-				exports.empty(refNode);
-				refNode.appendChild(node);
-				break;
-			case 'first':
-				if (refNode.firstChild) {
-					_insertBefore(node, refNode.firstChild);
-					break;
-				}
-				// else fallthrough...
-			default: // aka: last
-				refNode.appendChild(node);
+		var childNodes = parentNode.childNodes;
+		if (index < 0) {
+			index = Math.abs(index);
+			if (index >= childNodes.length) {
+				index = 0;
+			} else {
+				index = childNodes.length - index;
 			}
 		}
-		return node; // DomNode
+		if (childNodes.length && index < childNodes.length) {
+			parentNode.insertBefore(node, childNodes[index < 0 ? 0 : index]);
+		} else {
+			parentNode.appendChild(node);
+		}
+
+		return node;
 	};
 
 	/**
-	 * Create an element, allowing for optional attribute decoration and placement.
+	 * Insert a node into the DOM before another node.
+	 *
+	 * @param {(Node|string)} node
+	 * ID or node reference to insert
+	 *
+	 * @param {(Node|string)} referenceNode
+	 * ID or node reference to insert the node before
+	 *
+	 * @returns {Node}
+	 * The first argument resolved to an Element
+	 */
+	exports.insertBefore = function insertBefore(node, referenceNode) {
+		node = dom.byId(node);
+		referenceNode = dom.byId(referenceNode);
+
+		var parent = referenceNode.parentNode;
+
+		parent.insertBefore(node, referenceNode);
+
+		return node;
+	};
+
+	/**
+	 * Insert a node into the DOM after another node.
+	 *
+	 * @param {(Node|string)} node
+	 * ID or node reference to insert
+	 *
+	 * @param {(Node|string)} referenceNode
+	 * ID or node reference to insert the node after
+	 *
+	 * @returns {Node}
+	 * The first argument resolved to an Element
+	 */
+	exports.insertAfter = function insertAfter(node, referenceNode) {
+		node = dom.byId(node);
+		referenceNode = dom.byId(referenceNode);
+
+		var parent = referenceNode.parentNode;
+
+		if (parent.lastChild !== referenceNode) {
+			parent.insertBefore(node, referenceNode.nextSibling);
+		} else {
+			parent.appendChild(node);
+		}
+
+		return node;
+	};
+
+	/**
+	 * Insert a node into the DOM as the first child of a parent.
+	 *
+	 * @param {(Node|string)} node
+	 * ID or node reference to insert
+	 *
+	 * @param {(Node|string)} parentNode
+	 * ID or node reference to insert the node as the first child
+	 *
+	 * @returns {Node}
+	 * The first argument resolved to an Element
+	 */
+	exports.insertFirst = function insertFirst(node, parentNode) {
+		node = dom.byId(node);
+		parentNode = dom.byId(parentNode);
+
+		if (parentNode.firstChild) {
+			parentNode.insertBefore(node, parentNode.firstChild);
+		} else {
+			parentNode.appendChild(node);
+		}
+
+		return node;
+	};
+
+	/**
+	 * Insert a node into the DOM as the last child of a parent.
+	 *
+	 * @param {(Node|string)} node
+	 * ID or node reference to insert
+	 *
+	 * @param {(Node|string)} parentNode
+	 * ID or node reference to insert the node as the last child
+	 *
+	 * @returns {Node}
+	 * The first argument resolved to an Element
+	 */
+	exports.insertLast = function insertLast(node, parentNode) {
+		node = dom.byId(node);
+		parentNode = dom.byId(parentNode);
+
+		parentNode.appendChild(node);
+
+		return node;
+	};
+
+	/**
+	 * Replace a node in the DOM with another.
+	 *
+	 * @param {(Node|string)} node
+	 * ID or node reference to insert
+	 *
+	 * @param {(Node|string)} referenceNode
+	 * ID or node reference to remove
+	 *
+	 * @returns {Node}
+	 * The first argument resolved to an Element
+	 */
+	exports.replace = function replace(node, referenceNode) {
+		node = dom.byId(node);
+		referenceNode = dom.byId(referenceNode);
+
+		var parent = referenceNode.parentNode;
+
+		parent.replaceChild(node, referenceNode);
+
+		return node;
+	};
+
+	/**
+	 * Replace all children of a node with one node.
+	 *
+	 * @param {(Node|string)} node
+	 * ID or node reference to insert
+	 *
+	 * @param {(Node|string)} parentNode
+	 * ID or node reference to have its children removed and node inserted into
+	 *
+	 * @returns {Node}
+	 * The first argument resolved to an Element
+	 */
+	exports.replaceAll = function replaceAll(node, parentNode) {
+		node = dom.byId(node);
+		parentNode = dom.byId(parentNode);
+
+		exports.empty(parentNode);
+		parentNode.appendChild(node);
+
+		return node;
+	};
+
+	/**
+	 * Create an element, allowing for optional attribute decoration.
 	 *
 	 * @param {string} tag
 	 * @param {Object=} attrs
