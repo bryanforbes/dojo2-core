@@ -2,8 +2,8 @@ define([
 	'exports',
 	'../has',
 	'../dom',
-	'../dom-style'
-], function(exports, has, dom, domStyle){
+	'./style'
+], function (exports, has, dom, domStyle) {
 	// module:
 	//		dojo/dom-geometry
 
@@ -33,7 +33,7 @@ define([
 
 	exports.getMargins = function getMargins(node, computedStyle) {
 		node = dom.byId(node);
-		computedStyle = computedStyle || domStyle.getComputedStyle(node);
+		computedStyle = computedStyle || domStyle._getComputedStyle(node);
 
 		var left = toPixelValue(computedStyle.marginLeft),
 			top = toPixelValue(computedStyle.marginTop),
@@ -52,7 +52,7 @@ define([
 
 	exports.getPaddings = function getPaddings(node, computedStyle) {
 		node = dom.byId(node);
-		computedStyle = computedStyle || domStyle.getComputedStyle(node);
+		computedStyle = computedStyle || domStyle._getComputedStyle(node);
 
 		var left = toPixelValue(computedStyle.paddingLeft),
 			top = toPixelValue(computedStyle.paddingTop),
@@ -71,7 +71,7 @@ define([
 
 	exports.getBorders = function getBorders(node, computedStyle) {
 		node = dom.byId(node);
-		computedStyle = computedStyle || domStyle.getComputedStyle(node);
+		computedStyle = computedStyle || domStyle._getComputedStyle(node);
 
 		var left = computedStyle.borderLeftStyle !== 'none' ? toPixelValue(computedStyle.borderLeftWidth) : 0,
 			top = computedStyle.borderTopStyle !== 'none' ? toPixelValue(computedStyle.borderTopWidth) : 0,
@@ -90,7 +90,7 @@ define([
 
 	exports.getMarginBox = function getMarginBox(node, computedStyle) {
 		node = dom.byId(node);
-		computedStyle = computedStyle || domStyle.getComputedStyle(node);
+		computedStyle = computedStyle || domStyle._getComputedStyle(node);
 
 		var margins = exports.getMargins(node, computedStyle),
 			left,
@@ -108,7 +108,7 @@ define([
 
 	exports.setMarginBox = function setMarginBox(node, box, computedStyle) {
 		node = dom.byId(node);
-		computedStyle = computedStyle || domStyle.getComputedStyle(node);
+		computedStyle = computedStyle || domStyle._getComputedStyle(node);
 
 		var width = box.width,
 			height = box.height,
@@ -145,7 +145,7 @@ define([
 
 	exports.getContentBox = function getContentBox(node, computedStyle) {
 		node = dom.byId(node);
-		computedStyle = computedStyle || domStyle.getComputedStyle(node);
+		computedStyle = computedStyle || domStyle._getComputedStyle(node);
 
 		var paddings = exports.getPaddings(node, computedStyle),
 			borders,
@@ -177,7 +177,7 @@ define([
 
 	exports.setContentBox = function setContentBox(node, box, computedStyle) {
 		node = dom.byId(node);
-		computedStyle = computedStyle || domStyle.getComputedStyle(node);
+		computedStyle = computedStyle || domStyle._getComputedStyle(node);
 
 		var width = box.width,
 			height = box.height;
@@ -298,7 +298,7 @@ define([
 		//		object of dojo/dom-style.getComputedStyle().
 
 		node = dom.byId(node);
-		var me = exports.getMargins(node, computedStyle || domStyle.getComputedStyle(node));
+		var me = exports.getMargins(node, computedStyle || domStyle._getComputedStyle(node));
 		var size = node.getBoundingClientRect();
 		return {
 			w: (size.right - size.left) + me.w,
