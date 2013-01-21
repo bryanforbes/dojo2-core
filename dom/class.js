@@ -25,7 +25,7 @@ define(['exports', './dom'], function (exports, dom) {
 		//		Do something if a node with id="someNode" has class="aSillyClassName" present
 		//	|	if(dojo.hasClass('someNode','aSillyClassName')){ ... }
 
-		node = dom.byId(node);
+		node = dom.get(node);
 		classStr = classStr.trim();
 
 		var nodeClasses = node.className.trim();
@@ -91,7 +91,7 @@ define(['exports', './dom'], function (exports, dom) {
 		//	|		query('ul > li').addClass('firstLevel');
 		//	|	});
 
-		node = dom.byId(node);
+		node = dom.get(node);
 		classStr = classStr.trim();
 		var nodeClasses = node.className.trim();
 
@@ -157,7 +157,7 @@ define(['exports', './dom'], function (exports, dom) {
 		//	|		query('ul > li').removeClass('foo');
 		//	|	});
 
-		node = dom.byId(node);
+		node = dom.get(node);
 
 		var nodeClasses = '';
 		if (classStr != null) {
@@ -204,7 +204,7 @@ define(['exports', './dom'], function (exports, dom) {
 		//	|		query('.findMe').replaceClass('addMe', 'removeMe');
 		//	|	});
 
-		node = dom.byId(node);
+		node = dom.get(node);
 		var fakeNode = {
 			className: node.className
 		};
@@ -247,7 +247,7 @@ define(['exports', './dom'], function (exports, dom) {
 		//	|		query('.toggleMe').toggleClass('toggleMe');
 		//	|	});
 
-		node = dom.byId(node);
+		node = dom.get(node);
 		if (condition === undefined) {
 			classStr = classStr.trim().split(spaces);
 			var klass;

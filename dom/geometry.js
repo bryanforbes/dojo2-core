@@ -32,7 +32,7 @@ define([
 	}
 
 	exports.getMargins = function getMargins(node, computedStyle) {
-		node = dom.byId(node);
+		node = dom.get(node);
 		computedStyle = computedStyle || domStyle._getComputedStyle(node);
 
 		var left = toPixelValue(computedStyle.marginLeft),
@@ -51,7 +51,7 @@ define([
 	};
 
 	exports.getPaddings = function getPaddings(node, computedStyle) {
-		node = dom.byId(node);
+		node = dom.get(node);
 		computedStyle = computedStyle || domStyle._getComputedStyle(node);
 
 		var left = toPixelValue(computedStyle.paddingLeft),
@@ -70,7 +70,7 @@ define([
 	};
 
 	exports.getBorders = function getBorders(node, computedStyle) {
-		node = dom.byId(node);
+		node = dom.get(node);
 		computedStyle = computedStyle || domStyle._getComputedStyle(node);
 
 		var left = computedStyle.borderLeftStyle !== 'none' ? toPixelValue(computedStyle.borderLeftWidth) : 0,
@@ -89,7 +89,7 @@ define([
 	};
 
 	exports.getMarginBox = function getMarginBox(node, computedStyle) {
-		node = dom.byId(node);
+		node = dom.get(node);
 		computedStyle = computedStyle || domStyle._getComputedStyle(node);
 
 		var margins = exports.getMargins(node, computedStyle),
@@ -107,7 +107,7 @@ define([
 	};
 
 	exports.setMarginBox = function setMarginBox(node, box, computedStyle) {
-		node = dom.byId(node);
+		node = dom.get(node);
 		computedStyle = computedStyle || domStyle._getComputedStyle(node);
 
 		var width = box.width,
@@ -144,7 +144,7 @@ define([
 	};
 
 	exports.getContentBox = function getContentBox(node, computedStyle) {
-		node = dom.byId(node);
+		node = dom.get(node);
 		computedStyle = computedStyle || domStyle._getComputedStyle(node);
 
 		var paddings = exports.getPaddings(node, computedStyle),
@@ -176,7 +176,7 @@ define([
 	};
 
 	exports.setContentBox = function setContentBox(node, box, computedStyle) {
-		node = dom.byId(node);
+		node = dom.get(node);
 		computedStyle = computedStyle || domStyle._getComputedStyle(node);
 
 		var width = box.width,
@@ -265,7 +265,7 @@ define([
 		// includeScroll: Boolean?
 		// returns: Object
 
-		node = dom.byId(node);
+		node = dom.get(node);
 		var body = node.ownerDocument.body,
 			result = node.getBoundingClientRect();
 		result = {x: result.left, y: result.top, w: result.right - result.left, h: result.bottom - result.top};
@@ -297,7 +297,7 @@ define([
 		//		computedStyle parameter. Wherever possible, reuse the returned
 		//		object of dojo/dom-style.getComputedStyle().
 
-		node = dom.byId(node);
+		node = dom.get(node);
 		var me = exports.getMargins(node, computedStyle || domStyle._getComputedStyle(node));
 		var size = node.getBoundingClientRect();
 		return {
