@@ -1,8 +1,9 @@
 define([
 	'exports',
 	'module',
-	'./has'
-], function (exports, module, has) {
+	'./has',
+	'./lang'
+], function (exports, module, has, lang) {
 	// module:
 	//		dojo/dom
 
@@ -430,6 +431,87 @@ define([
 			}
 		};
 	}
+
+	exports.getComputedStyle = function getComputedStyle(node) {
+		return node.nodeType === 1 /* ELEMENT_NODE*/ ?
+			node.ownerDocument.defaultView.getComputedStyle(node, null) : {};
+	};
+
+	has.add('css-float', function (global, document, element) {
+		return typeof element.style.cssFloat === 'string';
+	});
+
+	var vendorPrefixes = ['ms', 'O', 'Moz', 'Webkit'],
+		floatName = has('css-float') ? 'cssFloat' : 'styleFloat',
+		documentElementStyle = document.documentElement.style,
+		styleNameCache = lang.mixin(Object.create(null), {
+			cssFloat: floatName,
+			styleFloat: floatName,
+			'float': floatName
+		});
+
+	exports.getStyleName = function getStyleName(name) {
+		if (name in styleNameCache) {
+			return styleNameCache[name];
+		}
+
+		if (documentElementStyle[name] !== undefined) {
+			return styleNameCache[name] = name;
+		}
+
+		var i = vendorPrefixes.length,
+			upperCaseName = name.charAt(0).toUpperCase() + name.substr(1);
+		while (i--) {
+			var prefixedName = vendorPrefixes[i] + upperCaseName;
+			if (documentElementStyle[prefixedName] !== undefined) {
+				return styleNameCache[name] = prefixedName;
+			}
+		}
+
+		return styleNameCache[name] = false;
+	};
+
+	exports.getStyle = function getStyle(node, name) {
+		// TODO: pixel value to integer conversion?
+		node = exports.get(node);
+
+		var computedStyle = exports.getComputedStyle(node);
+
+		if (!name) {
+			return computedStyle;
+		}
+
+		name = exports.getStyleName(name);
+
+		return computedStyle[name];
+	};
+
+	exports.setStyle = function setStyle(node, name, value) {
+		node = exports.get(node);
+
+		var style = node.style;
+
+		if (arguments.length > 2) {
+			name = exports.getStyleName(name);
+
+			if (!name) {
+				return false;
+			}
+			return style[name] = value;
+		}
+
+		var result = {};
+		for (var key in name) {
+			var prefixedKey = exports.getStyleName(key);
+			if (prefixedKey) {
+				result[key] = style[prefixedKey] = name[key];
+			}
+			else {
+				result[key] = false;
+			}
+		}
+		return result;
+	};
 
 	/**
 	 * Create an element, allowing for optional attribute decoration and placement.
