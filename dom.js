@@ -121,7 +121,7 @@ define([
 		}
 		return buggy;
 	});
-	
+
 	/**
 	 * Determines if an ancestor contains another node.
 	 *
@@ -160,7 +160,7 @@ define([
 		if (!element) {
 			return false;
 		}
-		
+
 		var style = element.style;
 		var prefixes = ['Khtml', 'O', 'ms', 'Moz', 'Webkit'],
 			i = prefixes.length,
@@ -391,6 +391,45 @@ define([
 
 		return node[propertyNames[name] || name];
 	};
+
+	has.add('dom-dataset', function (global, document, element) {
+		return 'dataset' in element;
+	});
+
+	if (!has('dom-dataset')) {
+		// TODO: dataset shim
+		exports.getData = function getData(node, name) {
+			node = exports.get(node);
+			name = name;
+		};
+		exports.setData = function setData(node, name, value) {
+			node = exports.get(node);
+			name = name;
+			value = value;
+		};
+	}
+	else {
+		exports.getData = function getData(node, name) {
+			node = exports.get(node);
+
+			if (name) {
+				return node.dataset[name];
+			}
+			return node.dataset;
+		};
+		exports.setData = function setData(node, name, value) {
+			node = exports.get(node);
+
+			if (arguments.length > 2) {
+				node.dataset[name] = value || '';
+			}
+			else if (typeof name === 'object') {
+				for (var key in name) {
+					node.dataset[key] = name[key] || '';
+				}
+			}
+		};
+	}
 
 	/**
 	 * Create an element, allowing for optional attribute decoration and placement.
