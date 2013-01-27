@@ -356,43 +356,6 @@ define([
 		return df; // DocumentFragment
 	};
 
-	var propertyNames = {
-		'class': 'className',
-		'for': 'htmlFor',
-		tabindex: 'tabIndex',
-		readonly: 'readOnly',
-		frameborder: 'frameBorder',
-		colspan: 'colSpan',
-		rowspan: 'rowSpan',
-		valuetype: 'valueType'
-	};
-
-	exports.setProperty = function setProperty(node, name, value) {
-		node = exports.get(node);
-
-		if (typeof name === 'object' && name) {
-			var properties = name;
-			for (name in properties) {
-				exports.setProperty(node, propertyNames[name] || name, properties[name]);
-			}
-		}
-		else {
-			if (name === 'innerText') {
-				var textNode = node.ownerDocument.createTextNode(value);
-				node.appendChild(textNode);
-			}
-			else {
-				node[propertyNames[name] || name] = value;
-			}
-		}
-	};
-
-	exports.getProperty = function getProperty(node, name) {
-		node = exports.get(node);
-
-		return node[propertyNames[name] || name];
-	};
-
 	has.add('dom-dataset', function (global, document, element) {
 		return 'dataset' in element;
 	});
@@ -533,10 +496,19 @@ define([
 
 		var node = targetDocument.createElement(tag);
 
-		// TODO: property/attribute setting
-		/*if (props) {
-			exports.setProperty(node, props);
-		}*/
+		if (props) {
+			for (var name in props) {
+				if (name === 'dataset') {
+					exports.setData(node, props[name]);
+				}
+				else if (name === 'style') {
+					exports.setStyle(node, props[name]);
+				}
+				else {
+					node[name] = props[name];
+				}
+			}
+		}
 
 		if (referenceNode) {
 			exports.insert(node, position, referenceNode);
