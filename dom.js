@@ -413,8 +413,8 @@ define([
 			'float': floatName
 		});
 
-	exports.getStyleName = function getStyleName(name) {
-		if (name in styleNameCache) {
+	exports.getStyleName = function getStyleName(name, skipCache) {
+		if (!skipCache && (name in styleNameCache)) {
 			return styleNameCache[name];
 		}
 
@@ -422,12 +422,13 @@ define([
 			return styleNameCache[name] = name;
 		}
 
-		var i = vendorPrefixes.length,
-			upperCaseName = name.charAt(0).toUpperCase() + name.substr(1);
+		var upperCaseName = name.charAt(0).toUpperCase() + name.substr(1),
+			i = vendorPrefixes.length;
 		while (i--) {
 			var prefixedName = vendorPrefixes[i] + upperCaseName;
 			if (documentElementStyle[prefixedName] !== undefined) {
-				return styleNameCache[name] = prefixedName;
+				vendorPrefixes = [vendorPrefixes[i]]; // memoize vendor prefix as only prefix in array
+				return styleNameCache[name] = prefixedName; // memoize prefixed property
 			}
 		}
 
@@ -444,7 +445,12 @@ define([
 			return computedStyle;
 		}
 
-		name = exports.getStyleName(name);
+		if (name in styleNameCache) {
+			name = styleNameCache[name];
+		}
+		else {
+			name = exports.getStyleName(name, true);
+		}
 
 		return computedStyle[name];
 	};
@@ -455,7 +461,12 @@ define([
 		var style = node.style;
 
 		if (arguments.length > 2) {
-			name = exports.getStyleName(name);
+			if (name in styleNameCache) {
+				name = styleNameCache[name];
+			}
+			else {
+				name = exports.getStyleName(name, true);
+			}
 
 			if (!name) {
 				return false;
@@ -465,7 +476,13 @@ define([
 
 		var result = {};
 		for (var key in name) {
-			var prefixedKey = exports.getStyleName(key);
+			var prefixedKey;
+			if (key in styleNameCache) {
+				prefixedKey = styleNameCache[key];
+			}
+			else {
+				prefixedKey = exports.getStyleName(key, true);
+			}
 			if (prefixedKey) {
 				result[key] = style[prefixedKey] = name[key];
 			}
