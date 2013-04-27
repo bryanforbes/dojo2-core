@@ -160,7 +160,9 @@ Those that are not are listed here:
    `// fall through`.
 1. `else` and `while` keywords must be on their own line, not cuddled with the
    closing bracket of the previous `if`/`do` block. This is consistent with the
-   use of all other block statements.
+   use of all other block statements and allows comments to be placed
+   consistently before conditional statements, rather than sometimes-before,
+   sometimes-inside.
 1. `var` declarations that declare multiple variables at once must always put
    each variable identifier on its own line. This prevents variable
    declarations being lost inside long lists that may also include immediate
@@ -374,12 +376,12 @@ using `/*jshint*/`.
 
 ## Testing
 
-Test cases MUST be written using
-[dojo2-teststack](https://github.com/csnover/dojo2-teststack).
+Test cases MUST be written using [Intern](https://github.com/theintern/intern)
+using the Object test interface and Assert assertion interface.
 
-XXX% line coverage and XXX% branch coverage MUST be provided for all code
-submitted to this repository, as reported by istanbul’s combined coverage
-results.
+90% branch coverage MUST be provided for all code submitted to this repository,
+as reported by istanbul’s combined coverage results for all supported
+platforms.
 
 
 ## License
