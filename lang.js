@@ -29,7 +29,7 @@ define([
 	 * An optional function to call to perform the copy
 	 * @returns {Object}
 	 */
-	function mixinOne(destination, source, copyFunction) {
+	function _mixIn(destination, source, copyFunction) {
 		for (var name in source) {
 			var sourceValue = source[name];
 			if (name in destination && destination[name] === sourceValue) {
@@ -42,7 +42,7 @@ define([
 		return destination;
 	}
 
-	mixinOne(lang, {
+	_mixIn(lang, {
 		/**
 		 * Adds all properties of one or more sources to destination
 		 *
@@ -52,22 +52,20 @@ define([
 		 * One or more objects from which to copy all properties
 		 * @returns {Object}
 		 */
-		mixin: function (destination) {
+		mixIn: function (destination) {
 			if (!destination) {
 				destination = {};
 			}
 			for (var i = 1; i < arguments.length; i++) {
-				lang.mixinOne(destination, arguments[i]);
+				_mixIn(destination, arguments[i]);
 			}
 			return destination;
 		},
 
-		mixinOne: mixinOne,
-
 		delegate: function (dest, src) {
 			// TODO: Eliminate this dependency
 			dest = Object.create(dest);
-			lang.mixinOne(dest, src);
+			_mixIn(dest, src);
 			return dest;
 		},
 
@@ -170,7 +168,7 @@ define([
 					returnValue = object.constructor ? new object.constructor() : {};
 				}
 
-				lang.mixinOne(returnValue, object, lang.clone);
+				_mixIn(returnValue, object, lang.clone);
 			}
 
 			return returnValue;

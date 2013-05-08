@@ -11,9 +11,9 @@ define([
 	registerSuite({
 		name: 'lang',
 
-		mixin: function () {
+		mixIn: function () {
 			var testObject = {};
-			lang.mixin(testObject, {
+			lang.mixIn(testObject, {
 				foo: 1,
 				bar: 2,
 				toString: Object.prototype.toString
