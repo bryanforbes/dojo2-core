@@ -4,9 +4,7 @@ define([
 	// module:
 	//		dojo/lang
 
-	var ObjectPrototype = Object.prototype,
-		ownProperty = ObjectPrototype.hasOwnProperty,
-		slice = Array.prototype.slice;
+	var slice = Array.prototype.slice;
 
 	function getDottedProperty(object, parts, create) {
 		var key,
@@ -176,40 +174,6 @@ define([
 			}
 
 			return returnValue;
-		},
-
-		/**
-		 * For every enumerable property in an object, invoke a callback.
-		 *
-		 * @param {Object} object
-		 * The object to iterate over
-		 * @param {function(?, string, Object)} callback
-		 * The function to be invoked for each property
-		 * @param {Object=} thisObject
-		 * An object to be used as `this` when `callback` is invoked
-		 */
-		forIn: function forIn(object, callback, thisObject) {
-			for (var key in object) {
-				callback.call(thisObject, object[key], key, object);
-			}
-		},
-
-		/**
-		 * For every own enumerable property in an object, invoke a callback.
-		 *
-		 * @param {Object} object
-		 * The object to iterate over
-		 * @param {function(?, string, Object)} callback
-		 * The function to be invoked for each property
-		 * @param {Object=} thisObject
-		 * An object to be used as `this` when `callback` is invoked
-		 */
-		forOwn: function forOwn(object, callback, thisObject) {
-			for (var key in object) {
-				if (ownProperty.call(object, key)) {
-					callback.call(thisObject, object[key], key, object);
-				}
-			}
 		}
 	});
 });

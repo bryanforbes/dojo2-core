@@ -113,48 +113,6 @@ define([
 			assert.notStrictEqual(lang.getProperty(object, 'A.D.C', true), undefined, 'getting objeect.A.D.C with create returns an object');
 		},
 
-		forIn: function () {
-			var values = [];
-			lang.forIn(base, function (value, key) {
-				assert.strictEqual(value, base[key], '"' + key + '" property of base is ' + value);
-				values.push(key);
-			});
-
-			assert.lengthOf(values, 1, 'callback called once for base');
-			assert(values.indexOf('foo') > -1, '"foo" was iterated over');
-
-			values = [];
-			lang.forIn(delegate, function (value, key) {
-				assert.strictEqual(value, delegate[key], '"' + key + '" property of delegate is ' + value);
-				values.push(key);
-			});
-
-			assert.lengthOf(values, 2, 'callback called twice for delegate');
-			assert(values.indexOf('foo') > -1 && values.indexOf('bar') > -1,
-				   '"foo" and "bar" were iterated over');
-		},
-
-		forOwn: function () {
-			var values = [];
-			lang.forOwn(base, function (value, key) {
-				assert.strictEqual(value, base[key], '"' + key + '" property of base is ' + value);
-				values.push(key);
-			});
-
-			assert.lengthOf(values, 1, 'callback called once for base');
-			assert(values.indexOf('foo') > -1, '"foo" was iterated over');
-
-			values = [];
-			lang.forOwn(delegate, function (value, key) {
-				assert.strictEqual(value, delegate[key], '"' + key + '" property of delegate is ' + value);
-				values.push(key);
-			});
-
-			assert.lengthOf(values, 1, 'callback called once for delegate');
-			assert(values.indexOf('bar') > -1, '"bar" was iterated over');
-			assert(values.indexOf('foo') === -1, '"foo" was skipped');
-		},
-
 		bind: function () {
 			var context1 = { foo: 'bar' },
 				context2 = { foo: 'baz' };
