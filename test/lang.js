@@ -1,7 +1,7 @@
 define([
 	'intern!object',
 	'intern/chai!assert',
-	'dojo/lang'
+	'../lang'
 ], function (registerSuite, assert, lang) {
 	var base = { foo: 1 },
 		delegate = Object.create(base);
