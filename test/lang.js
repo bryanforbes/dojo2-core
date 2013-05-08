@@ -1,12 +1,17 @@
 define([
-	'teststack!tdd',
-	'chai',
+	'intern!object',
+	'intern/chai!assert',
 	'dojo/lang'
-], function (test, chai, lang) {
-	var assert = chai.assert,
-		slice = Array.prototype.slice;
-	test.suite('lang', function () {
-		test.test('mixin', function () {
+], function (registerSuite, assert, lang) {
+	var base = { foo: 1 },
+		delegate = Object.create(base);
+
+	delegate.bar = 2;
+
+	registerSuite({
+		name: 'lang',
+
+		mixin: function () {
 			var testObject = {};
 			lang.mixin(testObject, {
 				foo: 1,
@@ -21,9 +26,34 @@ define([
 			assert.ok(testObject.hasOwnProperty('bar'), 'testObject has a "bar" property');
 			assert.strictEqual(testObject.foo, 3, 'testObject\'s "foo" property equals 3');
 			assert.ok(!testObject.hasOwnProperty('toString'), 'testObject does not have its own "toString" property');
-		});
+		},
 
-		test.test('clone', function () {
+		delegate: function () {
+			var a = {
+				x: 1,
+				y: function () { return 2; },
+				z1: 99
+			};
+			var b = {
+				x: 11,
+				y: function () { return 12; },
+				z2: 33,
+				toString: function () { return 'bark!'; },
+				toLocaleString: function () { return 'le bark-s!'; }
+			};
+			var c = lang.delegate(a, b);
+			assert.equal(a.x, 1);
+			assert.equal(a.y(), 2);
+			assert.equal(a.z1, 99);
+			assert.equal(c.x, 11);
+			assert.equal(c.y(), 12);
+			assert.equal(c.toString(), 'bark!');
+			assert.equal(c.toLocaleString(), 'le bark-s!');
+			assert.equal(c.z1, 99);
+			assert.equal(c.z2, 33);
+		},
+
+		clone: function () {
 			var object = {
 				foo: 'bar',
 				answer: 42,
@@ -57,9 +87,9 @@ define([
 			assert.equal(object.baz.c.g.toString(), clone.baz.c.g.toString());
 			assert.notStrictEqual(object.baz.c.g, clone.baz.c.g);
 			assert.strictEqual(object.toString, clone.toString);
-		});
+		},
 
-		test.test('setProperty', function () {
+		setProperty: function () {
 			var object = {};
 
 			assert.notDeepProperty(object, 'A.B.C', 'object does not have "A.B.C"');
@@ -67,9 +97,9 @@ define([
 			lang.setProperty(object, 'A.B.C', 400);
 			assert.deepProperty(object, 'A.B.C', 'object has "A.B.C"');
 			assert.deepPropertyVal(object, 'A.B.C', 400, 'object.A.B.C is 400');
-		});
+		},
 
-		test.test('getProperty', function () {
+		getProperty: function () {
 			var object = {
 				A: {
 					B: {
@@ -80,14 +110,10 @@ define([
 
 			assert.strictEqual(lang.getProperty(object, 'A.B.C'), 400, 'object.A.B.C is 400');
 			assert.strictEqual(lang.getProperty(object, 'A.D.C'), undefined, 'getting object.A.D.C returns undefined');
-		});
+			assert.notStrictEqual(lang.getProperty(object, 'A.D.C', true), undefined, 'getting objeect.A.D.C with create returns an object');
+		},
 
-		var base = { foo: 1 },
-			delegate = Object.create(base);
-
-		delegate.bar = 2;
-
-		test.test('forIn', function () {
+		forIn: function () {
 			var values = [];
 			lang.forIn(base, function (value, key) {
 				assert.strictEqual(value, base[key], '"' + key + '" property of base is ' + value);
@@ -106,9 +132,9 @@ define([
 			assert.lengthOf(values, 2, 'callback called twice for delegate');
 			assert(values.indexOf('foo') > -1 && values.indexOf('bar') > -1,
 				   '"foo" and "bar" were iterated over');
-		});
+		},
 
-		test.test('forOwn', function () {
+		forOwn: function () {
 			var values = [];
 			lang.forOwn(base, function (value, key) {
 				assert.strictEqual(value, base[key], '"' + key + '" property of base is ' + value);
@@ -127,9 +153,9 @@ define([
 			assert.lengthOf(values, 1, 'callback called once for delegate');
 			assert(values.indexOf('bar') > -1, '"bar" was iterated over');
 			assert(values.indexOf('foo') === -1, '"foo" was skipped');
-		});
+		},
 
-		test.test('bind', function () {
+		bind: function () {
 			var context1 = { foo: 'bar' },
 				context2 = { foo: 'baz' };
 
@@ -169,12 +195,12 @@ define([
 			};
 			result = bound4();
 			assert.strictEqual(result, 2, 'bound4() calls new "method" of context1');
-		});
+		},
 
-		test.test('partial', function () {
+		partial: function () {
 			var context = { foo: 'bar' };
 
-			function func (arg1, arg2, arg3) {
+			function func(arg1, arg2, arg3) {
 				return [this.foo, arg1, arg2, arg3];
 			}
 			var partial1 = lang.partial(func);
@@ -198,6 +224,6 @@ define([
 			assert.strictEqual(result[1], 'foo', 'partial4 has "foo" passed as func\'s first argument');
 			assert.strictEqual(result[2], 'bar', 'partial4 has "bar" passed as func\'s second argument');
 			assert.strictEqual(result[3], 'baz', 'partial4 has "baz" passed as func\'s third argument');
-		});
+		}
 	});
 });
