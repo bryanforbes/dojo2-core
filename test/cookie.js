@@ -1,8 +1,8 @@
 define([
-	'teststack!tdd',
-	'teststack/chai!assert',
-	'dojo-ts/has',
-	'dojo-ts/has!host-browser?../cookie'
+	'intern!tdd',
+	'intern/chai!assert',
+	'../has',
+	'../has!host-browser?../cookie'
 ], function (test, assert, has, cookie) {
 	var aKey = 'a=; ',
 		aValue = 'a1=; ',

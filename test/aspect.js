@@ -1,6 +1,6 @@
 define([
-	'teststack!tdd',
-	'teststack/chai!assert',
+	'intern!tdd',
+	'intern/chai!assert',
 	'../aspect'
 ], function (test, assert, aspect) {
 	test.suite('aspect', function () {
