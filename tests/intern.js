@@ -1,8 +1,11 @@
+// Learn more about configuring this file at <https://github.com/theintern/intern/wiki/Configuring-Intern>.
+// These default settings work OK for most people. The options that *must* be changed below are the
+// packages, suites, excludeInstrumentation, and (if you want functional tests) functionalSuites.
 define({
 	// The port on which the instrumenting proxy will listen
 	proxyPort: 9000,
 
-	// A fully qualified URL to the teststack proxy
+	// A fully qualified URL to the Intern proxy
 	proxyUrl: 'http://localhost:9000/',
 
 	// Default desired capabilities for all environments. Individual capabilities can be overridden by any of the
@@ -20,11 +23,10 @@ define({
 	// capabilities options specified for an environment will be copied as-is
 	environments: [
 		{ browserName: 'internet explorer', version: '10', platform: 'Windows 2012' },
-		{ browserName: 'internet explorer', platform: 'Windows 2008', version: '9' },
-		{ browserName: 'firefox', version: '18', platform: [ 'Linux', 'Mac 10.6', 'Windows 2012' ] },
+		{ browserName: 'internet explorer', version: '9', platform: 'Windows 2008' },
+		{ browserName: 'firefox', version: '19', platform: [ 'Linux', 'Mac 10.6', 'Windows 2012' ] },
 		{ browserName: 'chrome', platform: [ 'Linux', 'Mac 10.8', 'Windows 2008' ] },
-		{ browserName: 'safari', version: '6', platform: 'Mac 10.8' },
-		{ browserName: 'safari', version: '5', platform: 'Mac 10.6' }
+		{ browserName: 'safari', version: '6', platform: 'Mac 10.8' }
 	],
 
 	// Maximum number of simultaneous integration tests that should be executed on the remote WebDriver service
@@ -45,12 +47,15 @@ define({
 	// used here
 	loader: {
 		// Packages that should be registered with the loader in each testing environment
-		packages: [ { name: 'dojo', location: 'dojo2-core' } ]
+		packages: [ 'dojo2-core' ]
 	},
 
 	// Non-functional test suite(s) to run in each browser
-	suites: [ 'dojo/test/all' ],
+	suites: [ 'dojo2-core/tests/all' ],
 
 	// Functional test suite(s) to run in each browser once non-functional tests are completed
-	functionalSuites: [ 'dojo/test/functional' ]
+	functionalSuites: [ ],
+
+	// A regular expression matching URLs to files that should not be included in code coverage analysis
+	excludeInstrumentation: /^dojo2-core\/(?:tests\/)/
 });
