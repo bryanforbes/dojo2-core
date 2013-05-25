@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/csnover/dojo2-core.png?branch=master)](https://travis-ci.org/csnover/dojo2-core)
+[![Build Status](https://travis-ci.org/csnover/dojo2-core.png?branch=2.0)](https://travis-ci.org/csnover/dojo2-core)
 
 # The Dojo Toolkit
 
