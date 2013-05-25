@@ -1,6 +1,4 @@
-[![Build Status](https://travis-ci.org/csnover/dojo2-core.png?branch=2.0)](https://travis-ci.org/csnover/dojo2-core)
-
-# The Dojo Toolkit
+# The Dojo Toolkit [![Build Status](https://travis-ci.org/csnover/dojo2-core.png?branch=2.0)](https://travis-ci.org/csnover/dojo2-core)
 
 The Dojo Toolkit is a non-prescriptive collection of JavaScript modules
 designed to work together to help you build well-architected, high-performance
