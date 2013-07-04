@@ -47,7 +47,7 @@ define({
 	// used here
 	loader: {
 		// Packages that should be registered with the loader in each testing environment
-		packages: [ 'dojo2-core' ]
+		packages: [ { name: 'dojo2-core', location: '.' } ]
 	},
 
 	// Non-functional test suite(s) to run in each browser
@@ -57,5 +57,5 @@ define({
 	functionalSuites: [ ],
 
 	// A regular expression matching URLs to files that should not be included in code coverage analysis
-	excludeInstrumentation: /^dojo2-core\/(?:tests\/)/
+	excludeInstrumentation: /^tests\//
 });

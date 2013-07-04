@@ -1,4 +1,4 @@
 define([
 	'./aspect',
-	'intern/dojo/has!host-browser?./cookie'
+	'intern/node_modules/dojo/has!host-browser?./cookie'
 ], function () {});
