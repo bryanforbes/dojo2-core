@@ -35,7 +35,7 @@
 	//
 
 	var has = req.has = (function () {
-		var hasCache = {},
+		var hasCache = Object.create(null),
 			global = this,
 			document = global.document,
 			element = document && document.createElement('DIV');
@@ -45,7 +45,7 @@
 		}
 
 		has.add = function (name, test, now, force) {
-			(hasCache[name] === undefined || force) && (hasCache[name] = test);
+			(!(name in hasCache) || force) && (hasCache[name] = test);
 			now && has(name);
 		};
 

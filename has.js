@@ -1,104 +1,75 @@
 define([ 'require' ], function (require) {
-	// module:
-	//		dojo/has
-	// summary:
-	//		Defines the has.js API and several feature tests used by dojo.
-	// description:
-	//		This module defines the has API as described by the project has.js with the following additional features:
-	//
-	//		- the method has.add includes a forth parameter that controls whether or not existing tests are replaced
-	//		- the loader's has cache may be optionally copied into this module's has cahce.
-	//
-	//		This module adopted from https://github.com/phiggins42/has.js; thanks has.js team!
+	/*jshint node:true */
 
-	// try to pull the has implementation from the loader; both the dojo loader and bdLoad provide one
-	// if using a foreign loader, then the has cache may be initialized via the config object for this module
-	// WARNING: if a foreign loader defines require.has to be something other than the has.js API, then this implementation fail
 	var has = require.has;
+	if (!has) {
+		has = (function () {
+			var hasCache = Object.create(null),
+				global = this,
+				document = global.document,
+				element = document && document.createElement('DIV');
 
-	//if (/*!has*/ false) {
-	//	var
-	//		isBrowser =
-	//			// the most fundamental decision: are we in the browser?
-	//			typeof window != "undefined" &&
-	//			typeof location != "undefined" &&
-	//			typeof document != "undefined" &&
-	//			window.location == location && window.document == document,
-	//
-	//		// has API variables
-	//		global = this,
-	//		doc = isBrowser && document,
-	//		element = doc && doc.createElement("DiV"),
-	//		cache = (module.config && module.config()) || {};
-	//
-	//	has = function(name){
-	//		// summary:
-	//		//		Return the current value of the named feature.
-	//		//
-	//		// name: String|Integer
-	//		//		The name (if a string) or identifier (if an integer) of the feature to test.
-	//		//
-	//		// description:
-	//		//		Returns the value of the feature named by name. The feature must have been
-	//		//		previously added to the cache by has.add.
-	//
-	//		return typeof cache[name] == "function" ? (cache[name] = cache[name](global, doc, element)) : cache[name]; // Boolean
-	//	};
-	//
-	//	has.cache = cache;
-	//
-	//	has.add = function(name, test, now, force){
-	//		// summary:
-	//		//	 	Register a new feature test for some named feature.
-	//		// name: String|Integer
-	//		//	 	The name (if a string) or identifier (if an integer) of the feature to test.
-	//		// test: Function
-	//		//		 A test function to register. If a function, queued for testing until actually
-	//		//		 needed. The test function should return a boolean indicating
-	//		//	 	the presence of a feature or bug.
-	//		// now: Boolean?
-	//		//		 Optional. Omit if `test` is not a function. Provides a way to immediately
-	//		//		 run the test and cache the result.
-	//		// force: Boolean?
-	//		//	 	Optional. If the test already exists and force is truthy, then the existing
-	//		//	 	test will be replaced; otherwise, add does not replace an existing test (that
-	//		//	 	is, by default, the first test advice wins).
-	//		// example:
-	//		//		A redundant test, testFn with immediate execution:
-	//		//	|	has.add("javascript", function(){ return true; }, true);
-	//		//
-	//		// example:
-	//		//		Again with the redundantness. You can do this in your tests, but we should
-	//		//		not be doing this in any internal has.js tests
-	//		//	|	has.add("javascript", true);
-	//		//
-	//		// example:
-	//		//		Three things are passed to the testFunction. `global`, `document`, and a generic element
-	//		//		from which to work your test should the need arise.
-	//		//	|	has.add("bug-byid", function(g, d, el){
-	//		//	|		// g	== global, typically window, yadda yadda
-	//		//	|		// d	== document object
-	//		//	|		// el == the generic element. a `has` element.
-	//		//	|		return false; // fake test, byid-when-form-has-name-matching-an-id is slightly longer
-	//		//	|	});
-	//
-	//		(typeof cache[name]=="undefined" || force) && (cache[name]= test);
-	//		return now && has(name);
-	//	};
-	//}
+			/**
+			 * A standard API for retrieving feature test results and configuration data that may be
+			 * used to remove code at build time. See {@link has.add} for information on adding new
+			 * tests.
+			 *
+			 * @param name
+			 * The name of the feature to test.
+			 *
+			 * @returns The value of the given has-flag.
+			 *
+			 * @example
+			 * if (has('host-node')) {
+			 *     // Node.js-specific code which can be optimized out
+			 *     // for browser-specific builds
+			 * }
+			 */
+			function has(/**string*/ name) {
+				return typeof hasCache[name] === 'function' ? (hasCache[name] = hasCache[name](global, document, element)) : hasCache[name];
+			}
 
-	if (has('host-browser')) {
-		// Common application level tests
-		has.add('dom', true);
-		has.add('touch', 'ontouchstart' in document);
+			/**
+			 * Registers a new feature test or configuration value for use by {@link has}.
+			 *
+			 * @param name
+			 * The name of the feature to register.
+			 *
+			 * @param {*|function(global:Global, document:HTMLDocument=, element:HTMLElement=):*} test
+			 * A value or test function to register. If a function is passed, it will be called once
+			 * the first time its value is requested and the return value cached.
+			 *
+			 * @param now
+			 * If `test` is a function, passing a truthy value will cause it to be invoked
+			 * immediately. By default, a test function is not executed until the value is actually
+			 * used for the first time.
+			 *
+			 * @param force
+			 * If `name` is already registered, passing a truthy value will cause its value to be
+			 * replaced with the new value. By default, re-registering a test that already exists is
+			 * a no-op.
+			 */
+			has.add = function (/**string*/ name, test, /**boolean=*/ now, /**boolean=*/ force) {
+				(!(name in hasCache) || force) && (hasCache[name] = test);
+				now && has(name);
+			};
+
+			return has;
+		})();
 	}
 
+	has.add('host-browser', typeof document !== 'undefined' && typeof location !== 'undefined');
+	has.add('host-node', typeof process === 'object' && process.versions && process.versions.node);
+
 	/**
-	 * Resolves id into a module id based on possibly-nested tenary expression that branches on has feature test
-	 * value(s).
+	 * Resolves a conditional module ID into a real module ID based on a possibly-nested tenary
+	 * expression that branches on has-flags. See {@link has.load} for details on the syntax.
+	 *
+	 * @param id
+	 * The conditional module ID.
 	 *
 	 * @param toAbsMid
-	 * Resolves a relative module id into an absolute module id.
+	 * A function that converts a relative module ID into the correct absolute module ID.
 	 */
 	has.normalize = function (/**string*/ id, /**Function*/ toAbsMid) {
 		var tokens = id.match(/[\?:]|[^:\?]*/g),
@@ -133,10 +104,10 @@ define([ 'require' ], function (require) {
 	};
 
 	/**
-	 * Conditional loading of AMD modules based on a has feature test value.
+	 * Conditionally loads AMD modules based on the value of has-flags.
 	 *
 	 * @param id
-	 * Gives the resolved module id to load.
+	 * The module ID to load. The correct module ID to load is determined by the code in `has.normalize`.
 	 *
 	 * @param parentRequire
 	 * The loader require function with respect to the module that contained the plugin resource in its dependency
@@ -144,6 +115,11 @@ define([ 'require' ], function (require) {
 	 *
 	 * @param loaded
 	 * Callback to loader that consumes result of plugin demand.
+	 *
+	 * @example
+	 * define([
+	 *     'dojo/has!test-foo?module/foo:test-bar?module/bar:module/baz'
+	 * ], ...);
 	 */
 	has.load = function (/**string*/ id, /**Function*/ parentRequire, /**Function*/ loaded) {
 		if (id) {
