@@ -167,7 +167,7 @@ Those that are not are listed here:
    assignments.
 1. The most appropriate data types SHOULD be used in all cases (i.e. boolean for
    booleans, not number).
-1. Files MUST NOT end with an empty line.
+1. Files MUST end with an empty line.
 
 
 ## Documentation
