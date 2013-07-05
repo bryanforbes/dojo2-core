@@ -71,7 +71,7 @@ define([ 'require' ], function (require) {
 	 * @param toAbsMid
 	 * A function that converts a relative module ID into the correct absolute module ID.
 	 */
-	has.normalize = function (/**string*/ id, /**Function*/ toAbsMid) {
+	has.normalize = function (/**string*/ id, /**Function*/ normalize) {
 		var tokens = id.match(/[\?:]|[^:\?]*/g),
 			i = 0,
 			get = function (skip) {
@@ -100,7 +100,7 @@ define([ 'require' ], function (require) {
 			};
 
 		id = get();
-		return id && toAbsMid(id);
+		return id && normalize(id);
 	};
 
 	/**
@@ -121,12 +121,12 @@ define([ 'require' ], function (require) {
 	 *     'dojo/has!test-foo?module/foo:test-bar?module/bar:module/baz'
 	 * ], ...);
 	 */
-	has.load = function (/**string*/ id, /**Function*/ parentRequire, /**Function*/ loaded) {
+	has.load = function (/**string*/ id, /**Function*/ parentRequire, /**Function*/ load) {
 		if (id) {
-			parentRequire([ id ], loaded);
+			parentRequire([ id ], load);
 		}
 		else {
-			loaded();
+			load();
 		}
 	};
 
