@@ -1,4 +1,4 @@
-define(["./kernel", "../has", "./lang"], function(dojo, has, lang){
+define(["./kernel", "./has", "./lang"], function(dojo, has, lang){
 	// module:
 	//		dojo/_base/declare
 
@@ -204,7 +204,8 @@ define(["./kernel", "../has", "./lang"], function(dojo, has, lang){
 		// intentionally no return if a super method was not found
 	}
 
-	var inheritedImpl = dojo.config.isDebug ? inherited__debug : inherited;
+	has.add('debug-declare-inheritance', true);
+	var inheritedImpl = has('debug-declare-inheritance') ? inherited__debug : inherited;
 
 	// emulation of "instanceof"
 	function isInstanceOf(cls){
