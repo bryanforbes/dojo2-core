@@ -3,7 +3,7 @@ define([
 	'./watch',
 	'./util',
 	'../_base/array',
-	'../_base/lang',
+	'../lang',
 	'../on',
 	'../dom',
 	'../dom-construct',
@@ -11,11 +11,11 @@ define([
 	'../_base/window'/*=====,
 	'../request',
 	'../_base/declare' =====*/
-], function(module, watch, util, array, lang, on, dom, domConstruct, has, win/*=====, request, declare =====*/){
-	has.add('script-readystatechange', function(global, document){
+], function (module, watch, util, array, lang, on, dom, domConstruct, has, win/*=====, request, declare =====*/) {
+	has.add('script-readystatechange', function (global, document) {
 		var script = document.createElement('script');
-		return typeof script['onreadystatechange'] !== 'undefined' &&
-			(typeof global['opera'] === 'undefined' || global['opera'].toString() !== '[object Opera]');
+		return typeof script.onreadystatechange !== 'undefined' &&
+			(typeof global.opera === 'undefined' || global.opera.toString() !== '[object Opera]');
 	});
 
 	var mid = module.id.replace(/[\/\.\-]/g, '_'),
@@ -25,7 +25,7 @@ define([
 		callbacks = this[mid + '_callbacks'] = {},
 		deadScripts = [];
 
-	function attach(id, url, frameDoc){
+	function attach(id, url, frameDoc) {
 		var doc = (frameDoc || win.doc),
 			element = doc.createElement('script');
 
@@ -38,24 +38,25 @@ define([
 		return doc.getElementsByTagName('head')[0].appendChild(element);
 	}
 
-	function remove(id, frameDoc, cleanup){
+	function remove(id, frameDoc, cleanup) {
 		domConstruct.destroy(dom.byId(id, frameDoc));
 
-		if(callbacks[id]){
-			if(cleanup){
+		if (callbacks[id]) {
+			if (cleanup) {
 				// set callback to a function that deletes itself so requests that
 				// are in-flight don't error out when returning and also
 				// clean up after themselves
-				callbacks[id] = function(){
+				callbacks[id] = function () {
 					delete callbacks[id];
 				};
-			}else{
+			}
+			else {
 				delete callbacks[id];
 			}
 		}
 	}
 
-	function _addDeadScript(dfd){
+	function _addDeadScript(dfd) {
 		// Be sure to check ioArgs because it can dynamically change in the dojox/io plugins.
 		// See http://bugs.dojotoolkit.org/ticket/15890.
 		var options = dfd.response.options,
@@ -63,26 +64,26 @@ define([
 
 		deadScripts.push({ id: dfd.id, frameDoc: frameDoc });
 
-		if(options.ioArgs){
+		if (options.ioArgs) {
 			options.ioArgs.frameDoc = null;
 		}
 		options.frameDoc = null;
 	}
 
-	function canceler(dfd, response){
-		if(dfd.canDelete){
+	function canceler(dfd, response) {
+		if (dfd.canDelete) {
 			//For timeouts and cancels, remove the script element immediately to
 			//avoid a response from it coming back later and causing trouble.
 			script._remove(dfd.id, response.options.frameDoc, true);
 		}
 	}
-	function isValid(response){
+	function isValid(response) {
 		//Do script cleanup here. We wait for one inflight pass
 		//to make sure we don't get any weird things by trying to remove a script
 		//tag that is part of the call chain (IE 6 has been known to
 		//crash in that case).
-		if(deadScripts && deadScripts.length){
-			array.forEach(deadScripts, function(_script){
+		if (deadScripts && deadScripts.length) {
+			array.forEach(deadScripts, function (_script) {
 				script._remove(_script.id, _script.frameDoc);
 				_script.frameDoc = null;
 			});
@@ -91,27 +92,28 @@ define([
 
 		return response.options.jsonp ? !response.data : true;
 	}
-	function isReadyScript(response){
+	function isReadyScript() {
 		return !!this.scriptLoaded;
 	}
-	function isReadyCheckString(response){
+	function isReadyCheckString(response) {
 		var checkString = response.options.checkString;
 
 		return checkString && eval('typeof(' + checkString + ') !== "undefined"');
 	}
-	function handleResponse(response, error){
-		if(this.canDelete){
+	function handleResponse(response, error) {
+		if (this.canDelete) {
 			_addDeadScript(this);
 		}
-		if(error){
+		if (error) {
 			this.reject(error);
-		}else{
+		}
+		else {
 			this.resolve(response);
 		}
 	}
 
-	function script(url, options, returnDeferred){
-		var response = util.parseArgs(url, util.deepCopy({}, options));
+	function script(url, options, returnDeferred) {
+		var response = util.parseArgs(url, lang.deepCopy({}, options));
 		url = response.url;
 		options = response.options;
 
@@ -128,31 +130,31 @@ define([
 			canDelete: false
 		});
 
-		if(options.jsonp){
+		if (options.jsonp) {
 			var queryParameter = new RegExp('[?&]' + options.jsonp + '=');
-			if(!queryParameter.test(url)){
+			if (!queryParameter.test(url)) {
 				url += queryParameter +
 					(options.frameDoc ? 'parent.' : '') +
 					mid + '_callbacks.' + dfd.id;
 			}
 
 			dfd.canDelete = true;
-			callbacks[dfd.id] = function(json){
+			callbacks[dfd.id] = function (json) {
 				response.data = json;
 				dfd.handleResponse(response);
 			};
 		}
 
-		if(util.notify){
+		if (util.notify) {
 			util.notify.emit('send', response, dfd.promise.cancel);
 		}
 
-		if(!options.canAttach || options.canAttach(dfd)){
+		if (!options.canAttach || options.canAttach(dfd)) {
 			var node = script._attach(dfd.id, url, options.frameDoc);
 
-			if(!options.jsonp && !options.checkString){
-				var handle = on(node, loadEvent, function(evt){
-					if(evt.type === 'load' || readyRegExp.test(node.readyState)){
+			if (!options.jsonp && !options.checkString) {
+				var handle = on(node, loadEvent, function (evt) {
+					if (evt.type === 'load' || readyRegExp.test(node.readyState)) {
 						handle.remove();
 						dfd.scriptLoaded = evt;
 					}

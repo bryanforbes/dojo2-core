@@ -2,7 +2,7 @@ define([
 	'./request/default!'/*=====,
 	'./_base/declare',
 	'./promise/Promise' =====*/
-], function(request/*=====, declare, Promise =====*/){
+], function (request/*=====, declare, Promise =====*/) {
 	/*=====
 	request = function(url, options){
 		// summary:

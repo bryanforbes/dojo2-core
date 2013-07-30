@@ -1,4 +1,4 @@
-define(["./kernel", "./has"], function(dojo, has){
+define([ './kernel' ], function (dojo) {
 	// module:
 	//		dojo/lang
 
@@ -19,10 +19,7 @@ define(["./kernel", "./has"], function(dojo, has){
 		_pattern = /\{([^\}]+)\}/g,
 		lang;
 
-	/**
-	 * Common language helper methods.
-	 */
-	return lang = {
+	lang = {
 		// summary:
 		//		This module defines Javascript language extensions.
 
@@ -42,21 +39,24 @@ define(["./kernel", "./has"], function(dojo, has){
 			//		found in Object.prototype, are copied/added to dest. Copying/adding each particular property is
 			//		delegated to copyFunc (if any); copyFunc defaults to the Javascript assignment operator if not provided.
 			//		Notice that by default, _mixin executes a so-called "shallow copy" and aggregate types are copied/added by reference.
-			var name, s, i, empty = {};
+			var name,
+				sourceValue,
+				empty = {};
+
 			for (name in source) {
 				// the (!(name in empty) || empty[name] !== s) condition avoids copying properties in "source"
 				// inherited from Object.prototype.	 For example, if dest has a custom toString() method,
 				// don't overwrite it with the toString() method that source inherited from Object.prototype
-				s = source[name];
-				if(!(name in dest) || (dest[name] !== s && (!(name in empty) || empty[name] !== s))){
-					dest[name] = copyFunc ? copyFunc(s) : s;
+				sourceValue = source[name];
+				if (!(name in dest) || (dest[name] !== sourceValue && (!(name in empty) || empty[name] !== sourceValue))) {
+					dest[name] = copyFunc ? copyFunc(sourceValue) : sourceValue;
 				}
 			}
 
 			return dest; // Object
 		},
 
-		mixin: function (dest, sources) {
+		mixin: function (dest) {
 			// summary:
 			//		Copies/adds all properties of one or more sources to dest; returns dest.
 			// dest: Object
@@ -111,8 +111,10 @@ define(["./kernel", "./has"], function(dojo, has){
 			//	|	// will print "true"
 			//	|	console.log(flattened.braces);
 
-			if(!dest){ dest = {}; }
-			for(var i = 1, l = arguments.length; i < l; i++){
+			if (!dest) {
+				dest = {};
+			}
+			for (var i = 1, l = arguments.length; i < l; i++) {
 				lang._mixin(dest, arguments[i]);
 			}
 			return dest; // Object
@@ -154,11 +156,11 @@ define(["./kernel", "./has"], function(dojo, has){
 			//		whereas with `lang.setObject`, we can shorten that to:
 			//	| lang.setObject("parent.child.prop", "some value", obj);
 
-			var parts = name.split("."), p = parts.pop(), obj = getProp(parts, true, context);
+			var parts = name.split('.'), p = parts.pop(), obj = getProp(parts, true, context);
 			return obj && p ? (obj[p] = value) : undefined; // Object
 		},
 
-		getObject: function(name, create, context){
+		getObject: function (name, create, context) {
 			// summary:
 			//		Get a property from a dot-separated string, such as "A.B.C"
 			// description:
@@ -172,23 +174,23 @@ define(["./kernel", "./has"], function(dojo, has){
 			// context: Object?
 			//		Optional. Object to use as root of path. Defaults to
 			//		'dojo.global'. Null may be passed.
-			return getProp(name.split("."), create, context); // Object
+			return getProp(name.split('.'), create, context); // Object
 		},
 
-		_hitchArgs: function(scope, method){
+		_hitchArgs: function (scope, method) {
 			var pre = slice.call(arguments, 2);
 			var named = lang.isString(method);
-			return function(){
+			return function () {
 				// arrayify arguments
 				var args = slice.call(arguments);
 				// locate our method
-				var f = named ? (scope||dojo.global)[method] : method;
+				var f = named ? (scope || dojo.global)[method] : method;
 				// invoke with collected args
 				return f && f.apply(scope || this, pre.concat(args)); // mixed
 			}; // Function
 		},
 
-		hitch: function(scope, method){
+		hitch: function (scope, method) {
 			// summary:
 			//		Returns a function that will only ever execute in the a given scope.
 			//		This allows for easy use of object member functions
@@ -220,22 +222,24 @@ define(["./kernel", "./has"], function(dojo, has){
 			//	|	var foo = { bar: 2 };
 			//	|	lang.hitch(foo, function(){ this.bar = 10; })();
 			//		execute an anonymous function in scope of foo
-			if(arguments.length > 2){
+			if (arguments.length > 2) {
 				return lang._hitchArgs.apply(dojo, arguments); // Function
 			}
-			if(!method){
+			if (!method) {
 				method = scope;
 				scope = null;
 			}
-			if(lang.isString(method)){
+			if (lang.isString(method)) {
 				scope = scope || dojo.global;
-				if(!scope[method]){ throw(['lang.hitch: scope["', method, '"] is null (scope="', scope, '")'].join('')); }
-				return function(){ return scope[method].apply(scope, arguments || []); }; // Function
+				if (!scope[method]) {
+					throw (['lang.hitch: scope["', method, '"] is null (scope="', scope, '")'].join(''));
+				}
+				return function () { return scope[method].apply(scope, arguments || []); }; // Function
 			}
-			return !scope ? method : function(){ return method.apply(scope, arguments || []); }; // Function
+			return !scope ? method : function () { return method.apply(scope, arguments || []); }; // Function
 		},
 
-		partial: function(/*Function|String*/ method /*, ...*/){
+		partial: function () {
 			// summary:
 			//		similar to hitch() except that the scope object is left to be
 			//		whatever the execution context eventually becomes.
@@ -248,12 +252,12 @@ define(["./kernel", "./has"], function(dojo, has){
 			return lang.hitch.apply(dojo, arr.concat(slice.call(arguments))); // Function
 		},
 
-		/**
-		 * Performs a deep clone of objects and their children.
-		 * Supports Array, RegExp, Date, Node (DOM), Object, and objects with constructors.
-		 * Does not clone functions. Does not correctly handle cyclic structures.
-		 */
 		clone: function (object) {
+			//	summary:
+			//		Performs a deep clone of objects and their children.
+			//		Supports Array, RegExp, Date, Node (DOM), Object, and objects with constructors.
+			//		Does not clone functions. Does not correctly handle cyclic structures.
+
 			var returnValue;
 
 			if (!object || typeof object !== 'object') {
@@ -279,7 +283,7 @@ define(["./kernel", "./has"], function(dojo, has){
 			return returnValue;
 		},
 
-		replace: function(tmpl, map, pattern){
+		replace: function (tmpl, map, pattern) {
 			// summary:
 			//		Performs parameterized substitutions on a string. Throws an
 			//		exception if any parameter is unmatched.
@@ -345,7 +349,32 @@ define(["./kernel", "./has"], function(dojo, has){
 			//	|	// returns: Hello, Robert Cringely!
 
 			return tmpl.replace(pattern || _pattern, lang.isFunction(map) ?
-				map : function(_, k){ return lang.getObject(k, false, map); });
+				map : function (_, k) { return lang.getObject(k, false, map); });
+		},
+
+		deepCopy: function (target, source) {
+			//	summary:
+			//		Deeply-copies all properties from the source object to the target object.
+			//	target: Object
+			//		The object to which to deeply-copy copy properties from the source object
+			//	source: Object
+			//		The object from which to deeply-copy copy properties to the target object
+
+			for (var name in source) {
+				var targetValue = target[name],
+					sourceValue = source[name];
+				if (targetValue !== sourceValue) {
+					if (targetValue && typeof targetValue === 'object' && sourceValue && typeof sourceValue === 'object') {
+						lang.deepCopy(targetValue, sourceValue);
+					}
+					else {
+						target[name] = sourceValue;
+					}
+				}
+			}
+			return target;
 		}
 	};
+
+	return lang;
 });
