@@ -1,10 +1,8 @@
 define([ './has', 'require' ], function (has, require) {
-	if (!has('host-node')) {
-		throw new Error('Environment is not Node.js');
-	}
+	var nodeRequire = this.require && this.require.nodeRequire;
 
-	if (!require.nodeRequire) {
-		throw new Error('Cannot find the original Node.js require');
+	if (!nodeRequire) {
+		throw new Error('Cannot find the Node.js require');
 	}
 
 	/**
@@ -18,7 +16,7 @@ define([ './has', 'require' ], function (has, require) {
 	 * });
 	 */
 	return {
-		load: function (/**string*/ id, /**Function*/ require, /**Function*/ load) {
+		load: function (/**string*/ id, /**Function*/ contextRequire, /**Function*/ load) {
 			/*global define:true */
 
 			var oldDefine = define,
@@ -30,7 +28,7 @@ define([ './has', 'require' ], function (has, require) {
 			define = undefined;
 
 			try {
-				result = require.nodeRequire(id);
+				result = nodeRequire(id);
 			}
 			finally {
 				define = oldDefine;
