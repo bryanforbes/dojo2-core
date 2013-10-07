@@ -1,5 +1,5 @@
 define([
-	"../_base/lang",
+	"../lang",
 	"../_base/array",
 	"../date",
 	/*===== "../_base/declare", =====*/
@@ -18,7 +18,6 @@ var exports = {
 	// summary:
 	//		This modules defines dojo/date/locale, localization methods for Date.
 };
-lang.setObject(module.id.replace(/\//g, "."), exports);
 
 // Localization methods for Date.   Honor local customs using locale-dependent dojo.cldr data.
 
@@ -244,7 +243,7 @@ exports.format = function(/*Date*/ dateObject, /*__FormatOptions?*/ options){
 		formatLength = options.formatLength || 'short',
 		bundle = exports._getGregorianBundle(locale),
 		str = [],
-		sauce = lang.hitch(this, formatPattern, dateObject, bundle, options);
+		sauce = lang.bind(this, formatPattern, dateObject, bundle, options);
 	if(options.selector == "year"){
 		return _processPattern(bundle["dateFormatItem-yyyy"] || "yyyy", sauce);
 	}
@@ -287,7 +286,7 @@ exports._parseInfo = function(/*__FormatOptions?*/ options){
 	}
 
 	var tokens = [],
-		re = _processPattern(pattern, lang.hitch(this, _buildDateTimeRE, tokens, bundle, options));
+		re = _processPattern(pattern, lang.bind(this, _buildDateTimeRE, tokens, bundle, options));
 	return {regexp: re, tokens: tokens, bundle: bundle};
 };
 
@@ -621,7 +620,7 @@ exports._getGregorianBundle = function(/*String*/ locale){
 	var gregorian = {};
 	array.forEach(_customFormats, function(desc){
 		var bundle = i18n.getLocalization(desc.pkg, desc.name, locale);
-		gregorian = lang.mixin(gregorian, bundle);
+		gregorian = lang.mixIn(gregorian, bundle);
 	}, this);
 	return gregorian; /*Object*/
 };

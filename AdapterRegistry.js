@@ -1,4 +1,4 @@
-define(["./_base/kernel", "./_base/lang"], function(dojo, lang){
+define(["./_base/kernel", "./lang"], function(dojo, lang){
 // module:
 //		dojo/AdapterRegistry
 
@@ -35,7 +35,7 @@ var AdapterRegistry = dojo.AdapterRegistry = function(/*Boolean?*/ returnWrapper
 	this.returnWrappers = returnWrappers || false; // Boolean
 };
 
-lang.extend(AdapterRegistry, {
+lang.mixIn(AdapterRegistry.prototype, {
 	register: function(/*String*/ name, /*Function*/ check, /*Function*/ wrap, /*Boolean?*/ directReturn, /*Boolean?*/ override){
 		// summary:
 		//		register a check function to determine if the wrap function or

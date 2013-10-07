@@ -1,10 +1,10 @@
-define(["../_base/connect", "../_base/kernel", "../_base/lang", "../dom"],
-	function(connect, kernel, lang, dom){
+define(["../_base/connect", "../_base/kernel", "../dom"],
+	function(connect, kernel, dom){
 
 // module:
 //		dojo/dnd/common
 
-var exports = lang.getObject("dojo.dnd", true);
+var exports = {};
 /*=====
 // TODO: for 2.0, replace line above with this code.
 var exports = {

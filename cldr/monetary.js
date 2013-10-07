@@ -1,4 +1,4 @@
-define(["../_base/kernel", "../_base/lang"], function(dojo, lang){
+define([], function(){
 
 // module:
 //		dojo/cldr/monetary
@@ -7,7 +7,6 @@ var monetary = {
 	// summary:
 	//		TODOC
 };
-lang.setObject("dojo.cldr.monetary", monetary);
 
 monetary.getData = function(/*String*/ code){
 	// summary:

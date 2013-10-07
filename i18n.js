@@ -1,4 +1,4 @@
-define(["./_base/kernel", "require", "./has", "./_base/array", "./_base/config", "./_base/lang", "./has!host-browser?./_base/xhr", "./json", "module"],
+define(["./_base/kernel", "require", "./has", "./_base/array", "./_base/config", "./lang", "./has!host-browser?./_base/xhr", "./json", "module"],
 	function(dojo, require, has, array, config, lang, xhr, json, module){
 
 	// module:
@@ -90,7 +90,7 @@ define(["./_base/kernel", "require", "./has", "./_base/array", "./_base/config",
 					availableLocales = getAvailableLocales(!root._v1x && root, locale, bundlePath, bundleName);
 				require(availableLocales, function(){
 					for (var i = 1; i<availableLocales.length; i++){
-						current = lang.mixin(lang.clone(current), arguments[i]);
+						current = lang.mixIn(lang.clone(current), arguments[i]);
 					}
 					// target may not have been resolve (e.g., maybe only "fr" exists when "fr-ca" was requested)
 					var target = bundlePathAndName + "/" + locale;
@@ -110,7 +110,7 @@ define(["./_base/kernel", "require", "./has", "./_base/array", "./_base/config",
 
 		getLocalesToLoad = function(targetLocale){
 			var list = config.extraLocale || [];
-			list = lang.isArray(list) ? list : [list];
+			list = Array.isArray(list) ? list : [list];
 			list.push(targetLocale);
 			return list;
 		},
@@ -541,7 +541,7 @@ define(["./_base/kernel", "require", "./has", "./_base/array", "./_base/config",
 		}
 	}
 
-	return lang.mixin(thisModule, {
+	return lang.mixIn(thisModule, {
 		dynamic:true,
 		normalize:normalize,
 		load:load,

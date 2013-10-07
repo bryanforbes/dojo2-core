@@ -1,4 +1,4 @@
-define(["../_base/lang","../_base/Deferred" /*=====, "../_base/declare", "./api/Store" =====*/],
+define(["../lang","../_base/Deferred" /*=====, "../_base/declare", "./api/Store" =====*/],
 function(lang, Deferred /*=====, declare, Store =====*/){
 
 // module:
@@ -54,7 +54,6 @@ var Cache = function(masterStore, cachingStore, options){
 		}
 	});
 };
-lang.setObject("dojo.store.Cache", Cache);
 
 /*=====
 var __CacheArgs = {

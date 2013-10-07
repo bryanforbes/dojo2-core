@@ -18,7 +18,7 @@ define([
 		//		instances of this class.
 	}
 
-	lang.mixin(Promise.prototype, {
+	lang.mixIn(Promise.prototype, {
 		then: function(callback, errback, progback){
 			// summary:
 			//		Add new callbacks to the promise.

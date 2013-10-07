@@ -6,7 +6,7 @@ define(["./kernel", "./config", /*===== "./declare", =====*/ "./lang", "../Event
 	//		Animation loosely package based on Dan Pupius' work, contributed under CLA; see
 	//		http://pupius.co.uk/js/Toolkit.Drawing.js
 
-	var _mixin = lang.mixin;
+	var _mixIn = lang.mixIn;
 
 	// Module export
 	var basefx = {
@@ -48,15 +48,15 @@ define(["./kernel", "./config", /*===== "./declare", =====*/ "./lang", "../Event
 		//		The 'magic argument', mixing all the properties into this
 		//		animation instance.
 
-		_mixin(this, args);
-		if(lang.isArray(this.curve)){
+		_mixIn(this, args);
+		if(Array.isArray(this.curve)){
 			this.curve = new _Line(this.curve[0], this.curve[1]);
 		}
 
 	};
 	Animation.prototype = new Evented();
 
-	lang.extend(Animation, {
+	lang.mixIn(Animation.prototype, {
 		// duration: Integer
 		//		The time in milliseconds the animation will take to run
 		duration: 350,
@@ -185,7 +185,7 @@ define(["./kernel", "./config", /*===== "./declare", =====*/ "./lang", "../Event
 			_t._fire("beforeBegin", [_t.node]);
 
 			var de = delay || _t.delay,
-				_p = lang.hitch(_t, "_play", gotoStart);
+				_p = lang.bind(_t, "_play", gotoStart);
 
 			if(de > 0){
 				_t._delayTimer = setTimeout(_p, de);
@@ -332,7 +332,7 @@ define(["./kernel", "./config", /*===== "./declare", =====*/ "./lang", "../Event
 			run: function(){}
 		};
 
-	lang.extend(Animation, {
+	lang.mixIn(Animation.prototype, {
 
 		_startTimer: function(){
 			if(!this._timer){
@@ -340,7 +340,7 @@ define(["./kernel", "./config", /*===== "./declare", =====*/ "./lang", "../Event
 				ctr++;
 			}
 			if(!timer){
-				timer = setInterval(lang.hitch(runner, "run"), this.rate);
+				timer = setInterval(lang.bind(runner, "run"), this.rate);
 			}
 		},
 
@@ -379,7 +379,7 @@ define(["./kernel", "./config", /*===== "./declare", =====*/ "./lang", "../Event
 		//		args.end) (end is mandatory, start is optional)
 
 		args.node = dom.byId(args.node);
-		var fArgs = _mixin({ properties: {} }, args),
+		var fArgs = _mixIn({ properties: {} }, args),
 			props = (fArgs.properties.opacity = {});
 
 		props.start = !("start" in fArgs) ?
@@ -409,14 +409,14 @@ define(["./kernel", "./config", /*===== "./declare", =====*/ "./lang", "../Event
 		// summary:
 		//		Returns an animation that will fade node defined in 'args' from
 		//		its current opacity to fully opaque.
-		return basefx._fade(_mixin({ end: 1 }, args)); // Animation
+		return basefx._fade(_mixIn({ end: 1 }, args)); // Animation
 	};
 
 	basefx.fadeOut = function(/*__FadeArgs*/ args){
 		// summary:
 		//		Returns an animation that will fade node defined in 'args'
 		//		from its current opacity to fully transparent.
-		return basefx._fade(_mixin({ end: 0 }, args)); // Animation
+		return basefx._fade(_mixIn({ end: 0 }, args)); // Animation
 	};
 
 	basefx._defaultEasing = function(/*Decimal?*/ n){
@@ -447,7 +447,7 @@ define(["./kernel", "./config", /*===== "./declare", =====*/ "./lang", "../Event
 				start = prop.start;
 			if(start instanceof Color){
 				ret[p] = Color.blendColors(start, prop.end, r, prop.tempColor).toCss();
-			}else if(!lang.isArray(start)){
+			}else if(!Array.isArray(start)){
 				ret[p] = ((prop.end - start) * r) + start + (p != "opacity" ? prop.units || "px" : 0);
 			}
 		}
@@ -569,15 +569,15 @@ define(["./kernel", "./config", /*===== "./declare", =====*/ "./lang", "../Event
 					this.node.display = "block";
 				}
 				var prop = this.properties[p];
-				if(lang.isFunction(prop)){
+				if(typeof prop === "function")){
 					prop = prop(n);
 				}
-				prop = pm[p] = _mixin({}, (lang.isObject(prop) ? prop: { end: prop }));
+				prop = pm[p] = _mixIn({}, (prop && typeof prop === "object" ? prop : { end: prop }));
 
-				if(lang.isFunction(prop.start)){
+				if(typeof prop.start === "function"){
 					prop.start = prop.start(n);
 				}
-				if(lang.isFunction(prop.end)){
+				if(typeof prop.start === "function")){
 					prop.end = prop.end(n);
 				}
 				var isColor = (p.toLowerCase().indexOf("color") >= 0);
@@ -603,7 +603,7 @@ define(["./kernel", "./config", /*===== "./declare", =====*/ "./lang", "../Event
 			}
 			this.curve = new PropLine(pm);
 		});
-		connect.connect(anim, "onAnimate", lang.hitch(style, "set", anim.node));
+		connect.connect(anim, "onAnimate", lang.bind(style, "set", anim.node));
 		return anim; // Animation
 	};
 
@@ -658,13 +658,6 @@ define(["./kernel", "./config", /*===== "./declare", =====*/ "./lang", "../Event
 			onEnd: onEnd
 		}).play(delay || 0);
 	};
-
-
-	if(has("extend-dojo")){
-		_mixin(dojo, basefx);
-		// Alias to drop come 2.0:
-		dojo._Animation = Animation;
-	}
 
 	return basefx;
 });

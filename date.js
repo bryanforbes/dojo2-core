@@ -1,4 +1,4 @@
-define(["./has", "./_base/lang"], function(has, lang){
+define([], function(){
 // module:
 //		dojo/date
 
@@ -338,9 +338,6 @@ date.difference = function(/*Date*/date1, /*Date?*/date2, /*String?*/interval){
 	// Round for fractional values and DST leaps
 	return Math.round(delta); // Number (integer)
 };
-
-// Don't use setObject() because it may overwrite dojo/date/stamp (if that has already been loaded)
-has("extend-dojo") && lang.mixin(lang.getObject("dojo.date", true), date);
 
 return date;
 });

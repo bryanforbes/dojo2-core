@@ -1,5 +1,5 @@
-define(["exports", "./sniff", "./_base/lang", "./dom", "./dom-style", "./dom-prop"],
-		function(exports, has, lang, dom, style, prop){
+define(["exports", "./sniff", "./dom", "./dom-style", "./dom-prop"],
+		function(exports, has, dom, style, prop){
 	// module:
 	//		dojo/dom-attr
 	// summary:
@@ -87,7 +87,7 @@ define(["exports", "./sniff", "./_base/lang", "./dom", "./dom-style", "./dom-pro
 			// node's property
 			return value;	// Anything
 		}
-		if(propName != "href" && (typeof value == "boolean" || lang.isFunction(value))){
+		if(propName != "href" && (typeof value == "boolean" || typeof value === "function")){
 			// node's property
 			return value;	// Anything
 		}
@@ -178,7 +178,7 @@ define(["exports", "./sniff", "./_base/lang", "./dom", "./dom-style", "./dom-pro
 			style.set(node, value);
 			return node; // DomNode
 		}
-		if(forceProp || typeof value == "boolean" || lang.isFunction(value)){
+		if(forceProp || typeof value == "boolean" || typeof value === "function"){
 			return prop.set(node, name, value);
 		}
 		// node's attribute

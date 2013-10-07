@@ -1,4 +1,4 @@
-define(["./_base/lang", "./dom", "./io-query", "./json"], function(lang, dom, ioq, json){
+define(["./dom", "./io-query", "./json"], function(dom, ioq, json){
 	// module:
 	//		dojo/dom-form
 
@@ -16,7 +16,7 @@ define(["./_base/lang", "./dom", "./io-query", "./json"], function(lang, dom, io
         var val = obj[name];
         if(typeof val == "string"){ // inline'd type check
             obj[name] = [val, value];
-        }else if(lang.isArray(val)){
+        }else if(Array.isArray(val)){
             val.push(value);
         }else{
             obj[name] = value;

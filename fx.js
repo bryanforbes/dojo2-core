@@ -1,5 +1,5 @@
 define([
-	"./_base/lang",
+	"./lang",
 	"./Evented",
 	"./_base/kernel",
 	"./_base/array",
@@ -48,8 +48,7 @@ define([
 			if(a.delay){ this.duration += a.delay; }
 		}, this);
 	};
-	_chain.prototype = new Evented();
-	lang.extend(_chain, {
+	_chain.prototype = lang.mixIn(new Evented(), {
 		_onAnimate: function(){
 			this._fire("onAnimate", arguments);
 		},
@@ -143,8 +142,7 @@ define([
 			if(this._onAnimateCtx){ connect.disconnect(this._onAnimateCtx); }
 			if(this._onEndCtx){ connect.disconnect(this._onEndCtx); }
 		}
-	});
-	lang.extend(_chain, _baseObj);
+	}, _baseObj);
 
 	coreFx.chain = function(/*dojo/_base/fx.Animation[]*/ animations){
 		// summary:
@@ -190,7 +188,7 @@ define([
 			}
 		);
 	};
-	lang.extend(_combine, {
+	lang.mixIn(_combine.prototype, {
 		_doAction: function(action, args){
 			arrayUtil.forEach(this._animations, function(a){
 				a[action].apply(a, args);
@@ -236,8 +234,7 @@ define([
 		destroy: function(){
 			arrayUtil.forEach(this._connects, connect.disconnect);
 		}
-	});
-	lang.extend(_combine, _baseObj);
+	}, _baseObj);
 
 	coreFx.combine = function(/*dojo/_base/fx.Animation[]*/ animations){
 		// summary:
@@ -289,7 +286,7 @@ define([
 		//	|	}).play()
 		var node = args.node = dom.byId(args.node), s = node.style, o;
 
-		var anim = baseFx.animateProperty(lang.mixin({
+		var anim = baseFx.animateProperty(lang.mixIn({
 			properties: {
 				height: {
 					// wrapped in functions so we wait till the last second to query (in case value has changed)
@@ -342,7 +339,7 @@ define([
 
 		var node = args.node = dom.byId(args.node), s = node.style, o;
 
-		var anim = baseFx.animateProperty(lang.mixin({
+		var anim = baseFx.animateProperty(lang.mixIn({
 			properties: {
 				height: {
 					end: 1 // 0 causes IE to display the whole panel
@@ -404,7 +401,7 @@ define([
 		})(node);
 		init();
 
-		var anim = baseFx.animateProperty(lang.mixin({
+		var anim = baseFx.animateProperty(lang.mixIn({
 			properties: {
 				top: args.top || 0,
 				left: args.left || 0

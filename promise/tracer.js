@@ -1,8 +1,7 @@
 define([
-	"../lang",
 	"./Promise",
 	"../Evented"
-], function(lang, Promise, Evented){
+], function(Promise, Evented){
 	"use strict";
 
 	// module:
@@ -41,6 +40,8 @@ define([
 		}, 0);
 	}
 
+	var slice = [].slice;
+
 	Promise.prototype.trace = function(){
 		// summary:
 		//		Trace the promise.
@@ -53,7 +54,7 @@ define([
 		// returns: dojo/promise/Promise
 		//		The promise instance `trace()` is called on.
 
-		var args = lang._toArray(arguments);
+		var args = slice.call(arguments);
 		this.then(
 			function(value){ emitAsync(["resolved", value].concat(args)); },
 			function(error){ emitAsync(["rejected", error].concat(args)); },
@@ -74,7 +75,7 @@ define([
 		// returns: dojo/promise/Promise
 		//		The promise instance `traceRejected()` is called on.
 
-		var args = lang._toArray(arguments);
+		var args = slice.call(arguments);
 		this.otherwise(function(error){
 			emitAsync(["rejected", error].concat(args));
 		});

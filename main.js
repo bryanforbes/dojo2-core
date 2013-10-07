@@ -3,7 +3,6 @@ define([
 	"./has",
 	"require",
 	"./sniff",
-	"./_base/lang",
 	"./_base/array",
 	"./_base/config",
 	"./ready",
@@ -15,7 +14,7 @@ define([
 	"./has!dojo-firebug?./_firebug/firebug",
 	"./has!host-browser?./_base/browser",
 	"./has!dojo-sync-loader?./_base/loader"
-], function(kernel, has, require, sniff, lang, array, config, ready){
+], function(kernel, has, require, sniff, array, config, ready){
 	// module:
 	//		dojo/main
 	// summary:
@@ -36,7 +35,7 @@ define([
 		var deps= config.require;
 		if(deps){
 			// config.require may be dot notation
-			deps= array.map(lang.isArray(deps) ? deps : [deps], function(item){ return item.replace(/\./g, "/"); });
+			deps= array.map(Array.isArray(deps) ? deps : [deps], function(item){ return item.replace(/\./g, "/"); });
 			if(kernel.isAsync){
 				require(deps);
 			}else{

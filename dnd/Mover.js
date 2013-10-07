@@ -1,5 +1,5 @@
 define([
-	"../_base/array", "../_base/declare", "../_base/event", "../_base/lang", "../sniff", "../_base/window",
+	"../_base/array", "../_base/declare", "../_base/event", "../lang", "../sniff", "../_base/window",
 	"../dom", "../dom-geometry", "../dom-style", "../Evented", "../on", "../touch", "./common", "./autoscroll"
 ], function(array, declare, event, lang, has, win, dom, domGeom, domStyle, Evented, on, touch, dnd, autoscroll){
 
@@ -27,13 +27,13 @@ return declare("dojo.dnd.Mover", [Evented], {
 		this.events = [
 			// At the start of a drag, onFirstMove is called, and then the following
 			// listener is disconnected.
-			on(d, touch.move, lang.hitch(this, "onFirstMove")),
+			on(d, touch.move, lang.bind(this, "onFirstMove")),
 
 			// These are called continually during the drag
-			on(d, touch.move, lang.hitch(this, "onMouseMove")),
+			on(d, touch.move, lang.bind(this, "onMouseMove")),
 
 			// And these are called at the end of the drag
-			on(d, touch.release,  lang.hitch(this, "onMouseUp")),
+			on(d, touch.release,  lang.bind(this, "onMouseUp")),
 
 			// cancel text selection and text dragging
 			on(d, "dragstart",   event.stop),

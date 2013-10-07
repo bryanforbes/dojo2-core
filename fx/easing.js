@@ -1,4 +1,4 @@
-define(["../_base/lang"], function(lang){
+define([], function(){
 
 // module:
 //		dojo/fx/easing
@@ -269,8 +269,6 @@ var easingFuncs = {
 		return (easingFuncs.bounceOut(n * 2 - 1) / 2) + 0.5; // Decimal
 	}
 };
-
-lang.setObject("dojo.fx.easing", easingFuncs);
 
 return easingFuncs;
 });

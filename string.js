@@ -1,6 +1,6 @@
 define([
 	"./_base/kernel",	// kernel.global
-	"./_base/lang"
+	"./lang"
 ], function(kernel, lang){
 
 // module:
@@ -10,7 +10,6 @@ var string = {
 	// summary:
 	//		String utilities for Dojo
 };
-lang.setObject("dojo.string", string);
 
 string.rep = function(/*String*/str, /*Integer*/num){
 	// summary:
@@ -117,20 +116,22 @@ string.substitute = function(	/*String*/		template,
 
 	thisObject = thisObject || kernel.global;
 	transform = transform ?
-		lang.hitch(thisObject, transform) : function(v){ return v; };
+		lang.bind(thisObject, transform) : function(v){ return v; };
 
 	return template.replace(/\$\{([^\s\:\}]+)(?:\:([^\s\:\}]+))?\}/g,
 		function(match, key, format){
-			var value = lang.getObject(key, false, map);
+			var value = lang.getProperty(map, key);
 			if(format){
-				value = lang.getObject(format, false, thisObject).call(thisObject, value, key);
+				value = lang.getProperty(thisObject, format).call(thisObject, value, key);
 			}
 			return transform(value, key).toString();
 		}); // String
 };
 
 string.trim = String.prototype.trim ?
-	lang.trim : // aliasing to the native function
+	function(str){
+		return str.trim();
+	} :
 	function(str){
 		str = str.replace(/^\s+/, '');
 		for(var i = str.length - 1; i >= 0; i--){

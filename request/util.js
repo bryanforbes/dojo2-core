@@ -6,21 +6,6 @@ define([
 	'../io-query',
 	'../lang'
 ], function (exports, RequestError, CancelError, Deferred, ioQuery, lang) {
-	exports.deepCreate = function deepCreate(source, properties) {
-		properties = properties || {};
-		var target = Object.create(source),
-			name, value;
-
-		for (name in source) {
-			value = source[name];
-
-			if (value && typeof value === 'object') {
-				target[name] = exports.deepCreate(value, properties[name]);
-			}
-		}
-		return lang.deepCopy(target, properties);
-	};
-
 	var freeze = Object.freeze || function (obj) { return obj; };
 	function okHandler(response) {
 		return freeze(response);
@@ -49,8 +34,8 @@ define([
 
 		if (exports.notify) {
 			responsePromise.then(
-				lang.hitch(exports.notify, 'emit', 'load'),
-				lang.hitch(exports.notify, 'emit', 'error')
+				lang.bind(exports.notify, 'emit', 'load'),
+				lang.bind(exports.notify, 'emit', 'error')
 			);
 		}
 

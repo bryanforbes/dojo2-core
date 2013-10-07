@@ -1,6 +1,6 @@
 define([
 	"./_base/array",
-	"./_base/lang",
+	"./lang",
 	/*===== "./_base/declare", =====*/
 	"./number",
 	"./i18n", "./i18n!./cldr/nls/currency",
@@ -22,7 +22,6 @@ var currency = {
 	//		on the currency type and is not determined by the 'pattern' argument.  The fractional
 	//		portion is optional, by default, and variable length decimals are not supported.
 };
-lang.setObject("dojo.currency", currency);
 
 currency._mixInDefaults = function(options){
 	options = options || {};
@@ -42,7 +41,7 @@ currency._mixInDefaults = function(options){
 	data.fractional = [true, false];
 
 	// Mixin with provided options
-	return lang.mixin(data, options);
+	return lang.mixIn(data, options);
 };
 
 /*=====

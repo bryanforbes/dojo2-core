@@ -1,4 +1,4 @@
-define(["./_base/kernel", "./_base/lang", "./_base/Color", "./_base/array"], function(dojo, lang, Color, ArrayUtil){
+define(["./_base/kernel", "./lang", "./_base/Color", "./_base/array"], function(dojo, lang, Color, ArrayUtil){
 	// module:
 	//		dojo/colors
 
@@ -10,7 +10,6 @@ define(["./_base/kernel", "./_base/lang", "./_base/Color", "./_base/array"], fun
 	=====*/
 
 	var ColorExt = {};
-	lang.setObject("dojo.colors", ColorExt);
 
 //TODO: this module appears to break naming conventions
 
@@ -94,7 +93,7 @@ define(["./_base/kernel", "./_base/lang", "./_base/Color", "./_base/array"], fun
 	};
 
 	// mixin all CSS3 named colors not already in _base, along with SVG 1.0 variant spellings
-	lang.mixin(Color.named, {
+	lang.mixIn(Color.named, {
 		"aliceblue":	[240,248,255],
 		"antiquewhite": [250,235,215],
 		"aquamarine":	[127,255,212],

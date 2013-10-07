@@ -1,5 +1,5 @@
 define([
-	"../_base/lang", "../_base/declare", "../_base/Deferred", "../_base/array",
+	"../lang", "../_base/declare", "../_base/Deferred", "../_base/array",
 	"./util/QueryResults", "./util/SimpleQueryEngine" /*=====, "./api/Store" =====*/
 ], function(lang, declare, Deferred, array, QueryResults, SimpleQueryEngine /*=====, Store =====*/){
 
@@ -22,7 +22,7 @@ return declare("dojo.store.DataStore", base, {
 		// options: Object?
 		//		This provides any configuration information that will be mixed into the store,
 		//		including a reference to the Dojo data store under the property "store".
-		lang.mixin(this, options);
+		lang.mixIn(this, options);
  		if(!"idProperty" in options){
 			var idAttribute; 
 			try{
@@ -175,7 +175,7 @@ return declare("dojo.store.DataStore", base, {
 		var deferred = new Deferred(function(){ fetchHandle.abort && fetchHandle.abort(); });
 		deferred.total = new Deferred();
 		var converter = this._objectConverter(function(object){return object;});
-		fetchHandle = this.store.fetch(lang.mixin({
+		fetchHandle = this.store.fetch(lang.mixIn({
 			query: query,
 			onBegin: function(count){
 				deferred.total.resolve(count);

@@ -1,5 +1,5 @@
 define([
-	"../_base/array",  "../_base/declare", "../_base/event", "../_base/lang", "../_base/window",
+	"../_base/array",  "../_base/declare", "../_base/event", "../lang", "../_base/window",
 	"../dom-class", "../Evented", "../has", "../keys", "../on", "../topic", "../touch",
 	"./common", "./autoscroll", "./Avatar"
 ], function(array, declare, event, lang, win, domClass, Evented, has, keys, on, topic, touch,
@@ -74,10 +74,10 @@ var Manager = declare("dojo.dnd.Manager", [Evented], {
 		win.body().appendChild(this.avatar.node);
 		topic.publish("/dnd/start", source, nodes, this.copy);
 		this.events = [
-			on(win.doc, touch.move, lang.hitch(this, "onMouseMove")),
-			on(win.doc, touch.release,   lang.hitch(this, "onMouseUp")),
-			on(win.doc, "keydown",   lang.hitch(this, "onKeyDown")),
-			on(win.doc, "keyup",     lang.hitch(this, "onKeyUp")),
+			on(win.doc, touch.move, lang.bind(this, "onMouseMove")),
+			on(win.doc, touch.release,   lang.bind(this, "onMouseUp")),
+			on(win.doc, "keydown",   lang.bind(this, "onKeyDown")),
+			on(win.doc, "keyup",     lang.bind(this, "onKeyUp")),
 			// cancel text selection and text dragging
 			on(win.doc, "dragstart",   event.stop),
 			on(win.body(), "selectstart", event.stop)

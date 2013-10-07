@@ -1,4 +1,4 @@
-define([/*===== "./_base/declare", =====*/ "./_base/lang", "./i18n", "./i18n!./cldr/nls/number", "./string", "./regexp"],
+define([/*===== "./_base/declare", =====*/ "./lang", "./i18n", "./i18n!./cldr/nls/number", "./string", "./regexp"],
 	function(/*===== declare, =====*/ lang, i18n, nlsNumber, dstring, dregexp){
 
 // module:
@@ -8,7 +8,6 @@ var number = {
 	// summary:
 	//		localized formatting and parsing routines for Number
 };
-lang.setObject("dojo.number", number);
 
 /*=====
 number.__FormatOptions = declare(null, {
@@ -44,7 +43,7 @@ number.format = function(/*Number*/ value, /*number.__FormatOptions?*/ options){
 	// value:
 	//		the number to be formatted
 
-	options = lang.mixin({}, options || {});
+	options = lang.mixIn({}, options || {});
 	var locale = i18n.normalizeLocale(options.locale),
 		bundle = i18n.getLocalization("dojo.cldr", "number", locale);
 	options.customs = bundle;

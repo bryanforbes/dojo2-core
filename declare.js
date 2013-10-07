@@ -2,7 +2,7 @@ define(["./kernel", "./has", "./lang"], function(dojo, has, lang){
 	// module:
 	//		dojo/_base/declare
 
-	var mix = lang.mixin, op = Object.prototype, opts = op.toString,
+	var mix = lang.mixIn, op = Object.prototype, opts = op.toString,
 		xtor = new Function, counter = 0, cname = "constructor";
 
 	function err(msg, cls){ throw new Error("declare" + (cls ? " " + cls : "") + ": " + msg); }
@@ -225,14 +225,6 @@ define(["./kernel", "./has", "./lang"], function(dojo, has, lang){
 				target[name] = source[name];
 			}
 		}
-		if(has("bug-for-in-skips-shadowed")){
-			for(var extraNames= lang._extraNames, i= extraNames.length; i;){
-				name = extraNames[--i];
-				if(name != cname && source.hasOwnProperty(name)){
-					  target[name] = source[name];
-				}
-			}
-		}
 	}
 
 	// implementation of safe mixin function
@@ -304,19 +296,6 @@ define(["./kernel", "./has", "./lang"], function(dojo, has, lang){
 					t.nom = name;
 				}
 				target[name] = t;
-			}
-		}
-		if(has("bug-for-in-skips-shadowed")){
-			for(var extraNames= lang._extraNames, i= extraNames.length; i;){
-				name = extraNames[--i];
-				t = source[name];
-				if((t !== op[name] || !(name in op)) && name != cname){
-					if(opts.call(t) == "[object Function]"){
-						// non-trivial function method => attach its name
-						  t.nom = name;
-					}
-					target[name] = t;
-				}
 			}
 		}
 		return target;
@@ -818,7 +797,6 @@ define(["./kernel", "./has", "./lang"], function(dojo, has, lang){
 		// add name if specified
 		if(className){
 			proto.declaredClass = className;
-			lang.setObject(className, ctor);
 		}
 
 		// build chains and add them to the prototype

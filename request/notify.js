@@ -1,4 +1,4 @@
-define(['../Evented', '../_base/lang', './util'], function(Evented, lang, util){
+define(['../Evented', '../lang', './util'], function(Evented, lang, util){
 	// module:
 	//		dojo/request/notify
 	// summary:
@@ -19,7 +19,7 @@ define(['../Evented', '../_base/lang', './util'], function(Evented, lang, util){
 	var pubCount = 0,
 		slice = [].slice;
 
-	var hub = lang.mixin(new Evented, {
+	var hub = lang.mixIn(new Evented, {
 		onsend: function(data){
 			if(!pubCount){
 				this.emit('start');

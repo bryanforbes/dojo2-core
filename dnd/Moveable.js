@@ -1,5 +1,5 @@
 define([
-	"../_base/array", "../_base/declare", "../_base/event", "../_base/lang",
+	"../_base/array", "../_base/declare", "../_base/event", "../lang",
 	"../dom", "../dom-class", "../Evented", "../on", "../topic", "../touch", "./common", "./Mover", "../_base/window"
 ], function(array, declare, event, lang, dom, domClass, Evented, on, topic, touch, dnd, Mover, win){
 
@@ -29,10 +29,10 @@ var Moveable = declare("dojo.dnd.Moveable", [Evented], {
 		this.skip  = params.skip;
 		this.mover = params.mover ? params.mover : Mover;
 		this.events = [
-			on(this.handle, touch.press, lang.hitch(this, "onMouseDown")),
+			on(this.handle, touch.press, lang.bind(this, "onMouseDown")),
 			// cancel text selection and text dragging
-			on(this.handle, "dragstart",   lang.hitch(this, "onSelectStart")),
-			on(this.handle, "selectstart",   lang.hitch(this, "onSelectStart"))
+			on(this.handle, "dragstart",   lang.bind(this, "onSelectStart")),
+			on(this.handle, "selectstart",   lang.bind(this, "onSelectStart"))
 		];
 	},
 
@@ -58,8 +58,8 @@ var Moveable = declare("dojo.dnd.Moveable", [Evented], {
 		if(this.skip && dnd.isFormElement(e)){ return; }
 		if(this.delay){
 			this.events.push(
-				on(this.handle, touch.move, lang.hitch(this, "onMouseMove")),
-				on(this.handle, touch.release, lang.hitch(this, "onMouseUp"))
+				on(this.handle, touch.move, lang.bind(this, "onMouseMove")),
+				on(this.handle, touch.release, lang.bind(this, "onMouseUp"))
 			);
 			this._lastX = e.pageX;
 			this._lastY = e.pageY;

@@ -1,7 +1,7 @@
 define(
-	["require", "./_base/kernel", "./_base/lang", "./_base/array", "./_base/config", "./_base/html", "./_base/window",
+	["require", "./_base/kernel", "./lang", "./_base/array", "./_base/config", "./_base/html", "./_base/window",
 		"./_base/url", "./_base/json", "./aspect", "./date/stamp", "./Deferred", "./has", "./query", "./on", "./ready"],
-	function(require, dojo, dlang, darray, config, dhtml, dwindow, _Url, djson, aspect, dates, Deferred, has, query, don, ready){
+	function(require, dojo, lang, darray, config, dhtml, dwindow, _Url, djson, aspect, dates, Deferred, has, query, don, ready){
 
 	// module:
 	//		dojo/parser
@@ -13,7 +13,8 @@ define(
 	// If BorderContainer is loaded after _Widget's parameter list has been cached,
 	// we need to refresh that parameter list (for _Widget and all widgets that extend _Widget).
 	var extendCnt = 0;
-	aspect.after(dlang, "extend", function(){
+	// TODO: is this necessary?
+	aspect.after(lang, "extend", function(){
 		extendCnt++;
 	}, true);
 
@@ -50,7 +51,7 @@ define(
 			for(var i = 0, l = types.length; i < l; i++){
 				var t = types[i];
 				// TODO: Consider swapping getObject and require in the future
-				mixins[mixins.length] = (_ctorMap[t] = _ctorMap[t] || (dlang.getObject(t) || (~t.indexOf('/') && require(t))));
+				mixins[mixins.length] = (_ctorMap[t] = _ctorMap[t] || (lang.getProperty(window, t) || (~t.indexOf('/') && require(t))));
 			}
 			var ctor = mixins.shift();
 			_ctorMap[ts] = mixins.length ? (ctor.createSubclass ? ctor.createSubclass(mixins) : ctor.extend.apply(ctor, mixins)) : ctor;
@@ -212,11 +213,11 @@ define(
 
 			if(options.defaults){
 				// settings for the document itself (or whatever subtree is being parsed)
-				dlang.mixin(params, options.defaults);
+				lang.mixIn(params, options.defaults);
 			}
 			if(inherited){
 				// settings from dir=rtl or lang=... on a node above this node
-				dlang.mixin(params, inherited);
+				lang.mixIn(params, inherited);
 			}
 
 			// Get list of attributes explicitly listed in the markup
@@ -330,7 +331,7 @@ define(
 							}else{
 								// The user has specified the name of a global function like "myOnClick"
 								// or a single word function "return"
-								params[name] = dlang.getObject(value, false) || new Function(value);
+								params[name] = lang.getProperty(window, value) || new Function(value);
 							}
 							funcAttrs.push(name);	// prevent "double connect", see #15026
 							break;
@@ -363,7 +364,7 @@ define(
 			if(extra){
 				try{
 					extra = djson.fromJson.call(options.propsThis, "{" + extra + "}");
-					dlang.mixin(params, extra);
+					lang.mixIn(params, extra);
 				}catch(e){
 					// give the user a pointer to their invalid parameters. FIXME: can we kill this in production?
 					throw new Error(e.toString() + " in data-dojo-props='" + extra + "'");
@@ -371,7 +372,7 @@ define(
 			}
 
 			// Any parameters specified in "mixin" override everything else.
-			dlang.mixin(params, mixin);
+			lang.mixIn(params, mixin);
 
 			// Get <script> nodes associated with this widget, if they weren't specified explicitly
 			if(!scripts){
@@ -429,12 +430,12 @@ define(
 
 			// map it to the JS namespace if that makes sense
 			if(jsname){
-				dlang.setObject(jsname, instance);
+				lang.getProperty(instance, jsname);
 			}
 
 			// process connections and startup functions
 			for(i=0; i<aspects.length; i++){
-				aspect[aspects[i].advice || "after"](instance, aspects[i].method, dlang.hitch(instance, aspects[i].func), true);
+				aspect[aspects[i].advice || "after"](instance, aspects[i].method, lang.bind(instance, aspects[i].func), true);
 			}
 			for(i=0; i<calls.length; i++){
 				calls[i].call(instance);
@@ -709,7 +710,7 @@ define(
 
 			require(mids, function(){
 				for(var i=0; i<vars.length; i++){
-					dlang.setObject(vars[i], arguments[i]);
+					lang.getProperty(arguments[i], vars[i]);
 				}
 				d.resolve(arguments);
 			});
@@ -819,7 +820,7 @@ define(
 			if(!options && rootNode && rootNode.rootNode){
 				options = rootNode;
 				root = options.rootNode;
-			}else if(rootNode && dlang.isObject(rootNode) && !("nodeType" in rootNode)){
+			}else if(rootNode && typeof rootNode === "object" && !("nodeType" in rootNode)){
 				options = rootNode;
 			}else{
 				root = rootNode;
@@ -849,7 +850,7 @@ define(
 				});
 
 			// Blend the array with the promise
-			dlang.mixin(instances, p);
+			lang.mixIn(instances, p);
 			return instances;
 		}
 	};

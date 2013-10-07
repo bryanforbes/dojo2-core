@@ -113,7 +113,7 @@ define([
 	}
 
 	function script(url, options, returnDeferred) {
-		var response = util.parseArgs(url, lang.deepCopy({}, options));
+		var response = util.parseArgs(url, lang.deepMixIn({}, options));
 		url = response.url;
 		options = response.options;
 
@@ -125,7 +125,7 @@ define([
 			handleResponse
 		);
 
-		lang.mixin(dfd, {
+		lang.mixIn(dfd, {
 			id: mid + (counter++),
 			canDelete: false
 		});

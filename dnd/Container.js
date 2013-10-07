@@ -3,7 +3,7 @@ define([
 	"../_base/declare",
 	"../_base/event",
 	"../_base/kernel",
-	"../_base/lang",
+	"../lang",
 	"../_base/window",
 	"../dom",
 	"../dom-class",
@@ -84,11 +84,11 @@ var Container = declare("dojo.dnd.Container", Evented, {
 
 		// set up events
 		this.events = [
-			on(this.node, touch.over, lang.hitch(this, "onMouseOver")),
-			on(this.node, touch.out,  lang.hitch(this, "onMouseOut")),
+			on(this.node, touch.over, lang.bind(this, "onMouseOver")),
+			on(this.node, touch.out,  lang.bind(this, "onMouseOut")),
 			// cancel text selection and text dragging
-			on(this.node, "dragstart",   lang.hitch(this, "onSelectStart")),
-			on(this.node, "selectstart", lang.hitch(this, "onSelectStart"))
+			on(this.node, "dragstart",   lang.bind(this, "onSelectStart")),
+			on(this.node, "selectstart", lang.bind(this, "onSelectStart"))
 		];
 	},
 
@@ -342,7 +342,7 @@ var Container = declare("dojo.dnd.Container", Evented, {
 		// summary:
 		//		adds all necessary data to the output of the user-supplied creator function
 		var t = (this.creator || this.defaultCreator).call(this, item, hint);
-		if(!lang.isArray(t.type)){ t.type = ["text"]; }
+		if(!Array.isArray(t.type)){ t.type = ["text"]; }
 		if(!t.node.id){ t.node.id = dnd.getUniqueId(); }
 		domClass.add(t.node, "dojoDndItem");
 		return t;
@@ -392,7 +392,7 @@ dnd._defaultCreator = function(node){
 	var c = tag == "tbody" || tag == "thead" ? dnd._createTrTd :
 			dnd._createNode(dnd._defaultCreatorNodes[tag]);
 	return function(item, hint){	// Function
-		var isObj = item && lang.isObject(item), data, type, n;
+		var isObj = item && typeof item === "object", data, type, n;
 		if(isObj && item.tagName && item.nodeType && item.getAttribute){
 			// process a DOM node
 			data = item.getAttribute("dndData") || item.innerHTML;

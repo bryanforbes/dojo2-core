@@ -1,5 +1,5 @@
 define([
-	"../_base/array", "../_base/declare", "../_base/event", "../_base/kernel", "../_base/lang",
+	"../_base/array", "../_base/declare", "../_base/event", "../_base/kernel", "../lang",
 	"../dom", "../dom-construct", "../mouse", "../_base/NodeList", "../on", "../touch", "./common", "./Container"
 ], function(array, declare, event, kernel, lang, dom, domConstruct, mouse, NodeList, on, touch, dnd, Container){
 
@@ -53,8 +53,8 @@ var Selector = declare("dojo.dnd.Selector", Container, {
 		this.simpleSelection = false;
 		// set up events
 		this.events.push(
-			on(this.node, touch.press, lang.hitch(this, "onMouseDown")),
-			on(this.node, touch.release, lang.hitch(this, "onMouseUp"))
+			on(this.node, touch.press, lang.bind(this, "onMouseDown")),
+			on(this.node, touch.release, lang.bind(this, "onMouseUp"))
 		);
 	},
 
@@ -295,7 +295,7 @@ var Selector = declare("dojo.dnd.Selector", Container, {
 	onOverEvent: function(){
 		// summary:
 		//		this function is called once, when mouse is over our container
-		this.onmousemoveEvent = on(this.node, touch.move, lang.hitch(this, "onMouseMove"));
+		this.onmousemoveEvent = on(this.node, touch.move, lang.bind(this, "onMouseMove"));
 	},
 	onOutEvent: function(){
 		// summary:

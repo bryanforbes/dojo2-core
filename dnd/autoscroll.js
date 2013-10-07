@@ -1,5 +1,5 @@
-define(["../_base/lang", "../sniff", "../_base/window", "../dom-geometry", "../dom-style", "../window"],
-	function(lang, has, win, domGeom, domStyle, winUtils){
+define(["../sniff", "../_base/window", "../dom-geometry", "../dom-style", "../window"],
+	function(has, win, domGeom, domStyle, winUtils){
 
 // module:
 //		dojo/dnd/autoscroll
@@ -9,7 +9,6 @@ var exports = {
 	//		Used by dojo/dnd/Manager to scroll document or internal node when the user
 	//		drags near the edge of the viewport or a scrollable node
 };
-lang.setObject("dojo.dnd.autoscroll", exports);
 
 exports.getViewport = winUtils.getBox;
 

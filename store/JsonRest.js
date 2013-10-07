@@ -1,4 +1,4 @@
-define(["../_base/xhr", "../_base/lang", "../json", "../_base/declare", "./util/QueryResults" /*=====, "./api/Store" =====*/
+define(["../_base/xhr", "../lang", "../json", "../_base/declare", "./util/QueryResults" /*=====, "./api/Store" =====*/
 ], function(xhr, lang, JSON, declare, QueryResults /*=====, Store =====*/){
 
 // No base class, but for purposes of documentation, the base class is dojo/store/api/Store
@@ -62,7 +62,7 @@ return declare("dojo.store.JsonRest", base, {
 		// returns: Object
 		//		The object in the store that matches the given id.
 		options = options || {};
-		var headers = lang.mixin({ Accept: this.accepts }, this.headers, options.headers || options);
+		var headers = lang.mixIn({ Accept: this.accepts }, this.headers, options.headers || options);
 		return xhr("GET", {
 			url: this.target + id,
 			handleAs: "json",
@@ -100,7 +100,7 @@ return declare("dojo.store.JsonRest", base, {
 				url: hasId ? this.target + id : this.target,
 				postData: JSON.stringify(object),
 				handleAs: "json",
-				headers: lang.mixin({
+				headers: lang.mixIn({
 					"Content-Type": "application/json",
 					Accept: this.accepts,
 					"If-Match": options.overwrite === true ? "*" : null,
@@ -133,7 +133,7 @@ return declare("dojo.store.JsonRest", base, {
 		options = options || {};
 		return xhr("DELETE", {
 			url: this.target + id,
-			headers: lang.mixin({}, this.headers, options.headers)
+			headers: lang.mixIn({}, this.headers, options.headers)
 		});
 	},
 
@@ -149,7 +149,7 @@ return declare("dojo.store.JsonRest", base, {
 		//		The results of the query, extended with iterative methods.
 		options = options || {};
 
-		var headers = lang.mixin({ Accept: this.accepts }, this.headers, options.headers);
+		var headers = lang.mixIn({ Accept: this.accepts }, this.headers, options.headers);
 
 		if(options.start >= 0 || options.count >= 0){
 			headers.Range = headers["X-Range"] //set X-Range for Opera since it blocks "Range" header

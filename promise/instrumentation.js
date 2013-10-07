@@ -83,9 +83,9 @@ define([
 
 		var usage = has("config-useDeferredInstrumentation");
 		if(usage){
-			tracer.on("resolved", lang.hitch(console, "log", "resolved"));
-			tracer.on("rejected", lang.hitch(console, "log", "rejected"));
-			tracer.on("progress", lang.hitch(console, "log", "progress"));
+			tracer.on("resolved", lang.bind(console, "log", "resolved"));
+			tracer.on("rejected", lang.bind(console, "log", "rejected"));
+			tracer.on("progress", lang.bind(console, "log", "progress"));
 
 			var args = [];
 			if(typeof usage === "string"){

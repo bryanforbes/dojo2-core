@@ -1,4 +1,4 @@
-define(["./_base/lang", "./_base/array", "./dom"], function(lang, array, dom){
+define(["./_base/array", "./dom"], function(array, dom){
 	// module:
 	//		dojo/dom-class
 
@@ -225,7 +225,7 @@ define(["./_base/lang", "./_base/array", "./dom"], function(lang, array, dom){
 				for(var i = 0, len = classStr.length; i < len; ++i){
 					cls = cls.replace(" " + classStr[i] + " ", " ");
 				}
-				cls = lang.trim(cls);
+				cls = cls.trim();
 			}else{
 				cls = "";
 			}

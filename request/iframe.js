@@ -4,7 +4,7 @@ define([
 	'./watch',
 	'./util',
 	'./handlers',
-	'../_base/lang',
+	'../lang',
 	'../io-query',
 	'../query',
 	'../has',
@@ -170,7 +170,7 @@ define([
 				formNode = dfd._tmpForm = createForm();
 			}else if(options.method === 'GET' && formNode && response.url.indexOf('?') > -1){
 				queryStr = response.url.slice(response.url.indexOf('?') + 1);
-				data = lang.mixin(ioQuery.queryToObject(queryStr), data);
+				data = lang.mixIn(ioQuery.queryToObject(queryStr), data);
 			}
 
 			if(formNode){
@@ -206,7 +206,7 @@ define([
 					};
 					for(var x in data){
 						var val = data[x];
-						if(lang.isArray(val) && val.length > 1){
+						if(Array.isArray(val) && val.length > 1){
 							for(var i=0; i<val.length; i++){
 								createInput(x, val[i]);
 							}
@@ -305,7 +305,7 @@ define([
 							query('a', doc.documentElement).orphan();
 							var xmlText = doc.documentElement.innerText;
 							xmlText = xmlText.replace(/>\s+</g, '><');
-							response.text = lang.trim(xmlText);
+							response.text = xmlText.trim();
 						}else{
 							response.data = doc;
 						}
@@ -338,7 +338,7 @@ define([
 		method: 'POST'
 	};
 	function iframe(url, options, returnDeferred){
-		var response = util.parseArgs(url, util.deepCreate(defaultOptions, options), true);
+		var response = util.parseArgs(url, lang.deepDelegate(defaultOptions, options), true);
 		url = response.url;
 		options = response.options;
 

@@ -1,4 +1,4 @@
-define(["../../_base/array", "../../_base/lang", "../../_base/Deferred"
+define(["../../_base/array", "../../lang", "../../_base/Deferred"
 ], function(array, lang, Deferred){
 
 // module:
@@ -55,8 +55,6 @@ var QueryResults = function(results){
 	}
 	return results; // Object
 };
-
-lang.setObject("dojo.store.util.QueryResults", QueryResults);
 
 return QueryResults;
 

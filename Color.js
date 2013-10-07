@@ -47,7 +47,7 @@ define(["./kernel", "./lang", "./array", "./config"], function(dojo, lang, Array
 		"transparent": config.transparentColor || [0,0,0,0]
 	};
 
-	lang.extend(Color, {
+	lang.mixIn(Color.prototype, {
 		r: 255, g: 255, b: 255, a: 1,
 		_set: function(r, g, b, a){
 			var t = this; t.r = r; t.g = g; t.b = b; t.a = a;
@@ -61,9 +61,9 @@ define(["./kernel", "./lang", "./array", "./config"], function(dojo, lang, Array
 			// example:
 			//	|	var c = new Color(); // no color
 			//	|	c.setColor("#ededed"); // greyish
-			if(lang.isString(color)){
+			if(typeof color === "string"){
 				Color.fromString(color, this);
-			}else if(lang.isArray(color)){
+			}else if(Array.isArray(color)){
 				Color.fromArray(color, this);
 			}else{
 				this._set(color.r, color.g, color.b, color.a);

@@ -1,4 +1,4 @@
-define(["./_base/kernel", "require", "./_base/config", "./_base/connect", "./_base/lang", "./domReady", "./sniff"],
+define(["./_base/kernel", "require", "./_base/config", "./_base/connect", "./lang", "./domReady", "./sniff"],
 	function(dojo, require, config, connect, lang, domReady, has){
 
 	// module:
@@ -72,7 +72,7 @@ define(["./_base/kernel", "require", "./_base/config", "./_base/connect", "./_ba
 	function _replace(hash){
 		if(_ieUriMonitor){
 			if(_ieUriMonitor.isTransitioning()){
-				setTimeout(lang.hitch(null,_replace,hash), _pollFrequency);
+				setTimeout(lang.bind(null,_replace,hash), _pollFrequency);
 				return;
 			}
 			var href = _ieUriMonitor.iframe.location.href;
@@ -207,7 +207,7 @@ define(["./_base/kernel", "require", "./_base/config", "./_base/connect", "./_ba
 					_dispatchEvent();
 				}else{
 					// s4 (waiting for iframe to catch up to main window)
-					setTimeout(lang.hitch(this,this.pollLocation),0);
+					setTimeout(lang.bind(this,this.pollLocation),0);
 					return;
 				}
 			}else if(_recentHash === hash && (ifrOffline || recentIframeQuery === iframeSearch)){
@@ -222,7 +222,7 @@ define(["./_base/kernel", "require", "./_base/config", "./_base/connect", "./_ba
 					expectedIFrameQuery = hash;
 					ifr.src = ifrSrc + "?" + expectedIFrameQuery;
 					ifrOffline = false; //we're updating the iframe src - set offline to false so we can check again on next poll.
-					setTimeout(lang.hitch(this,this.pollLocation),0); //yielded transition to s4 while iframe reloads.
+					setTimeout(lang.bind(this,this.pollLocation),0); //yielded transition to s4 while iframe reloads.
 					return;
 				}else if(!ifrOffline){
 					// s3 (iframe location changed via back/forward button), set main window url and transition to s1.
@@ -231,10 +231,10 @@ define(["./_base/kernel", "require", "./_base/config", "./_base/connect", "./_ba
 					_dispatchEvent();
 				}
 			}
-			setTimeout(lang.hitch(this,this.pollLocation), _pollFrequency);
+			setTimeout(lang.bind(this,this.pollLocation), _pollFrequency);
 		};
 		resetState(); // initialize state (transition to s1)
-		setTimeout(lang.hitch(this,this.pollLocation), _pollFrequency);
+		setTimeout(lang.bind(this,this.pollLocation), _pollFrequency);
 	}
 	domReady(function(){
 		if("onhashchange" in dojo.global && (!has("ie") || (has("ie") >= 8 && document.compatMode != "BackCompat"))){	//need this IE browser test because "onhashchange" exists in IE8 in IE7 mode

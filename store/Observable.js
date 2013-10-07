@@ -1,4 +1,4 @@
-define(["../_base/kernel", "../_base/lang", "../_base/Deferred", "../_base/array" /*=====, "./api/Store" =====*/
+define(["../_base/kernel", "../lang", "../_base/Deferred", "../_base/array" /*=====, "./api/Store" =====*/
 ], function(kernel, lang, Deferred, array /*=====, Store =====*/){
 
 // module:
@@ -51,7 +51,7 @@ var Observable = function(/*Store*/ store){
 		options = options || {};
 		var results = originalQuery.apply(this, arguments);
 		if(results && results.forEach){
-			var nonPagedOptions = lang.mixin({}, options);
+			var nonPagedOptions = lang.mixIn({}, options);
 			delete nonPagedOptions.start;
 			delete nonPagedOptions.count;
 
@@ -180,8 +180,6 @@ var Observable = function(/*Store*/ store){
 
 	return store;
 };
-
-lang.setObject("dojo.store.Observable", Observable);
 
 return Observable;
 });

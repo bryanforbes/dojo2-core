@@ -1,5 +1,5 @@
-define(["./_base/lang", "./sniff", "./_base/window", "./dom", "./dom-geometry", "./dom-style"],
-	function(lang, has, baseWindow, dom, geom, style){
+define(["./sniff", "./_base/window", "./dom", "./dom-geometry", "./dom-style"],
+	function(has, baseWindow, dom, geom, style){
 
 	// module:
 	//		dojo/window
@@ -161,8 +161,6 @@ define(["./_base/lang", "./sniff", "./_base/window", "./dom", "./dom-geometry", 
 			}
 		}
 	};
-
-	has("extend-dojo") && lang.setObject("dojo.window", window);
 
 	return window;
 });
