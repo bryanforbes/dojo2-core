@@ -1,6 +1,6 @@
 define(['exports'], function (exports) {
-	var slice = [].slice,
-		hasOwn = {}.hasOwnProperty;
+	var slice = Array.prototype.slice,
+		hasOwn = Object.prototype.hasOwnProperty;
 	function createSpy(func) {
 		function invoke(thisObject, args) {
 			proxy.called = true;
