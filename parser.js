@@ -430,7 +430,7 @@ define(
 
 			// map it to the JS namespace if that makes sense
 			if(jsname){
-				lang.getProperty(instance, jsname);
+				lang.setProperty(instance, jsname);
 			}
 
 			// process connections and startup functions
@@ -710,7 +710,7 @@ define(
 
 			require(mids, function(){
 				for(var i=0; i<vars.length; i++){
-					lang.getProperty(arguments[i], vars[i]);
+					lang.setProperty(arguments[i], vars[i]);
 				}
 				d.resolve(arguments);
 			});
